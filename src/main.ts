@@ -353,7 +353,7 @@ async function setTestMode(on: boolean) {
   chk.checked = on;
   if (on && !beep) beep = makeBeep(actx);
   mix.override = on ? beep : null;
-  // 화면은 그대로 (소리 테스트는 소리만 바꿈 — 소스 없는 슬롯은 어차피 카드로 보임)
+  renderer.testMode = on;
   localStorage.setItem('rtm.test', on ? '1' : '0');
   restartPlayback();
   status(on ? '소리 테스트: 모든 노트를 삑 소리로' : '');
@@ -509,6 +509,7 @@ $('exportBtn').onclick = async () => {
     cv.height = height;
     const g = cv.getContext('2d')!;
     const r = new Renderer(tpl, assets);
+    r.testMode = renderer.testMode;
     r.videoTest = renderer.videoTest;
     r.stealth = false; // 내보내기는 항상 진짜 글자로
     const total = Math.ceil(dur * fps);
