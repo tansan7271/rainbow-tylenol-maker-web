@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rainbow Tylenol Maker</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <header id="topbar">
+      <strong class="logo" id="logo">🌈 Rainbow Tylenol Maker</strong>
+      <button id="stealthBtn" class="small" title="위장 표시 켜기/끄기 (H)">👁</button>
+      <select id="projectSelect" title="템플릿/프로젝트 열기"></select>
+      <button id="saveBtn" title="Cmd+S">저장</button>
+      <button id="saveAsBtn">다른 이름으로</button>
+      <button id="jsonOutBtn" class="small" title="프로젝트를 JSON 파일로 받기">⤓ JSON</button>
+      <button id="jsonInBtn" class="small" title="JSON 파일에서 프로젝트 불러오기">⤒ JSON</button>
+      <span class="sep"></span>
+      <button id="playBtn" class="primary" title="Space">▶ 재생</button>
+      <button id="homeBtn" title="처음으로 (Home)">⏮</button>
+      <label class="chk"><input type="checkbox" id="loopChk" checked /> 반복</label>
+      <span id="timeDisp">-</span>
+      <span class="sep"></span>
+      <label>격자 <select id="snapSel">
+        <option value="1">1박</option><option value="0.5">1/8</option><option value="0.25" selected>1/16</option><option value="0.125">1/32</option>
+      </select></label>
+      <label class="chk" title="원곡 켜기/끄기"><input type="checkbox" id="songOn" checked /> 원곡</label>
+      <select id="songSel" title="원곡: 내 파일 / 유튜브 원본 소리(미리보기용) / 없음" style="max-width:150px"></select>
+      <input type="range" id="songGain" min="0" max="1.5" step="0.05" title="원곡 볼륨" />
+      <label class="chk" title="합성 소리 켜기/끄기"><input type="checkbox" id="synthOn" checked /> 합성</label>
+      <input type="range" id="synthGain" min="0" max="2" step="0.05" value="1" title="합성 볼륨" />
+      <span class="sep"></span>
+      <label class="chk testToggle" title="소리 테스트: 모든 노트를 삑 하나로 + 화면은 멜로디 색 깜빡임 (T)"><input type="checkbox" id="testChk" /><span> 🔊 소리 테스트</span></label>
+      <label class="chk testToggle" title="영상 테스트: 클립 대신 알파벳 카드(좌/우 표시), 자막은 가나다 — 연출·효과·타이밍 보기 (V)"><input type="checkbox" id="videoTestChk" /><span> 🎬 영상 테스트</span></label>
+      <label title="원곡 튜닝에 맞춰 합성 음 전체를 미세조정 (센트, 100 = 반음)">튜닝 <input type="number" id="tuning" step="1" min="-100" max="100" style="width:56px" />¢</label>
+      <label title="미디어 처리: 브라우저(기본) 또는 내 컴퓨터의 ffmpeg 도우미">처리 <select id="modeSel"></select></label>
+      <span class="grow"></span>
+      <span id="status"></span>
+      <a href="./compare.html" target="_blank"><button title="유튜브 원본이랑 나란히 비교">⇆ 비교</button></a>
+      <button id="exportBtn" class="primary">🎬 mp4 내보내기</button>
+    </header>
+
+    <main id="layout">
+      <section id="previewPane">
+        <div id="previewWrap"><canvas id="preview"></canvas><div id="ytBox" hidden><div id="ytPlayer"></div></div></div>
+        <div id="scenePanel" class="panel"></div>
+      </section>
+      <aside id="sidePane">
+        <details id="subBox" class="fold" open>
+          <summary>자막</summary>
+          <div id="subPanel" class="panel"></div>
+        </details>
+        <details id="slotBox" class="fold" open>
+          <summary>악기 슬롯 <button id="addSlotBtn" class="small">+ 슬롯</button></summary>
+          <div id="slotPane" class="panel">
+            <p class="hint">클릭 = 새 노트에 쓸 슬롯 · ⇦ = 선택한 노트를 이 슬롯으로 · 숫자키 1~9로도 고를 수 있어</p>
+            <div id="slotList"></div>
+          </div>
+        </details>
+      </aside>
+    </main>
+
+    <details id="rollBox" class="fold">
+      <summary>피아노롤</summary>
+      <section id="rollPane"></section>
+    </details>
+    <footer id="helpbar">
+      빈칸 클릭: 노트 추가 · 드래그: 이동 · 오른쪽 끝 드래그: 길이 · ⌥드래그: 복제 · Shift+드래그: 범위 선택 · 더블클릭/우클릭: 삭제 ·
+      ↑↓: 음정 (Shift ±옥타브) · ←→: 이동 · ⌘C/⌘V: 복사/재생헤드에 붙여넣기 · ⌘Z/⇧⌘Z · 휠: 위아래, Shift/가로휠: 좌우, ⌘휠: 확대 ·
+      장면 레인 경계 드래그로 장면 길이 조절
+    </footer>
+
+    <dialog id="slotDialog"></dialog>
+    <dialog id="exportDialog"></dialog>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

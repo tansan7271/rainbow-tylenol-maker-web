@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Compare</title>
+    <link rel="stylesheet" href="./src/style.css" />
+    <style>
+      body { display: flex; flex-direction: column; height: 100vh; overflow: auto; }
+      #cmpTop { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 6px 10px; background: #15181e; border-bottom: 1px solid #262a33; }
+      #panes { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; min-height: 0; }
+      .pane { display: flex; flex-direction: column; min-height: 0; }
+      .pane h4 { margin: 0 0 4px; color: #adb5bd; font-weight: 600; }
+      .stage { position: relative; flex: 1; min-height: 0; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 6px; overflow: hidden; }
+      .stage canvas { max-width: 100%; max-height: 100%; aspect-ratio: 3 / 2; width: 100%; object-fit: contain; }
+      #orig { width: 100%; height: 100%; }
+      #orig iframe, #orig video { width: 100%; height: 100%; border: 0; object-fit: contain; }
+      .origMsg { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; color: #adb5bd; padding: 20px; line-height: 1.7; }
+      #info { padding: 6px 10px; background: #101216; border-top: 1px solid #262a33; display: grid; gap: 6px; }
+      #frameBig { font: 700 28px/1 ui-monospace, Menlo, monospace; color: #ffd43b; cursor: copy; }
+      #frameSub { font: 13px ui-monospace, Menlo, monospace; color: #adb5bd; }
+      #scrub { width: 100%; }
+      .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      #copyText { flex: 1; min-width: 380px; font: 13px ui-monospace, Menlo, monospace; }
+      #toast { color: #8ce99a; font-size: 12px; min-width: 90px; }
+      kbd { background: #2b303b; border: 1px solid #3b4252; border-radius: 4px; padding: 0 4px; font-size: 11px; }
+    </style>
+  </head>
+  <body>
+    <header id="cmpTop">
+      <strong id="cmpLogo">⇆ 비교</strong>
+      <select id="cmpSource" title="템플릿/프로젝트"></select>
+      <button id="reloadBtn" title="템플릿/프로젝트 다시 읽기 (수정 반영)">↻ 다시 읽기</button>
+      <span class="sep"></span>
+      <label>왼쪽 화면 <select id="leftMode">
+        <option value="video">영상 테스트 (카드 + 가나다)</option>
+        <option value="normal">실제 클립</option>
+        <option value="sound">소리 테스트 화면</option>
+      </select></label>
+      <label class="chk" title="우리 소리 켜기/끄기"><input type="checkbox" id="oursOn" /> 우리 소리</label>
+      <input type="range" id="oursVol" min="0" max="1.5" step="0.05" title="우리 볼륨" />
+      <label class="chk" title="유튜브 원본 소리 켜기/끄기"><input type="checkbox" id="origOn" /> 원본 소리</label>
+      <input type="range" id="origVol" min="0" max="1" step="0.05" title="원본 볼륨" />
+      <label>속도 <select id="speed">
+        <option value="1">1x</option><option value="0.5">0.5x</option><option value="0.25">0.25x</option>
+      </select></label>
+      <label title="원본 영상 투명도">원본 투명도 <input type="range" id="origOpacity" min="0" max="1" step="0.05" /></label>
+      <span class="sep"></span>
+      <button id="origYtBtn" class="small" title="원본을 유튜브로">▶ 유튜브</button>
+      <button id="origFileBtn" class="small" title="원본을 내 컴퓨터의 영상 파일로">📁 원본 파일</button>
+      <label title="원본이 앞뒤로 어긋나면 보정 (초, +면 원본을 더 뒤 시점으로)">오프셋 <input type="number" id="origOffset" step="0.01" style="width:70px" />s</label>
+    </header>
+
+    <section id="panes">
+      <div class="pane"><h4>우리 버전</h4><div class="stage"><canvas id="ours"></canvas></div></div>
+      <div class="pane"><h4>원본 (유튜브)</h4><div class="stage"><div id="orig"></div></div></div>
+    </section>
+
+    <section id="info">
+      <div class="row">
+        <button id="playBtn" class="primary">▶ 재생</button>
+        <button id="b10" title="-10프레임 (Shift+←)">-10</button>
+        <button id="b1" title="-1프레임 (←)">-1</button>
+        <button id="f1" title="+1프레임 (→)">+1</button>
+        <button id="f10" title="+10프레임 (Shift+→)">+10</button>
+        <span id="frameBig" title="클릭하면 현재 프레임 복사">F 0</span>
+        <span id="frameSub"></span>
+      </div>
+      <input type="range" id="scrub" min="0" max="900" step="1" value="0" />
+      <div class="row">
+        <button id="inBtn" title="시작 표시 (I)">[ 시작</button>
+        <button id="outBtn" title="끝 표시 (O)">끝 ]</button>
+        <label class="chk"><input type="checkbox" id="loopChk" /> 구간 반복 (L)</label>
+        <input type="text" id="copyText" readonly placeholder="[ 시작 / 끝 ] 을 찍으면 여기에 구간이 생겨" />
+        <button id="copyBtn" title="복사 (C)">📋 복사</button>
+        <span id="toast"></span>
+      </div>
+      <div class="hint">
+        <kbd>Space</kbd> 재생/정지 · <kbd>←</kbd><kbd>→</kbd> 1프레임 · <kbd>Shift</kbd>+화살표 10프레임 · <kbd>I</kbd>/<kbd>O</kbd> 구간 시작/끝 · <kbd>L</kbd> 구간 반복 · <kbd>C</kbd> 복사 ·
+        프레임 번호 = mp4 내보내기 기준 (30fps, 0 = 범위 시작) · 유튜브는 프레임 단위로 정확히 안 맞아서 ±1~2프레임 어긋날 수 있어
+      </div>
+    </section>
+    <script type="module" src="./src/compare.ts"></script>
+  </body>
+</html>
