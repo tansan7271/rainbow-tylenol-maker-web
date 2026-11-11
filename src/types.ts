@@ -16,6 +16,7 @@ export interface Slot {
   name: string;
   label: string; // 자막 글자. 비우면 기본 자리표시(가나다…)
   noSub?: boolean; // 이 슬롯 노트는 자막에 안 나옴
+  noVideo?: boolean; // 추가 레이어 슬롯: 화면 없이 자막만 (소스가 없을 때 카드도 안 그림)
   videoSec?: number; // 템플릿 규격: 화면에 이어 틀 영상 길이(초). 영상 프레임을 이만큼 뽑음 (최대 6초)
   audioSec?: number; // 템플릿 규격(참고): 이 슬롯 소리 조각의 권장 길이(초)
   color: string;

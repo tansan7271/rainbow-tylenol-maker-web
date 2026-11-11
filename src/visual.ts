@@ -273,9 +273,14 @@ export class Renderer {
     g.restore();
   }
 
+  /** 카드로 그릴까: 영상 테스트이거나, 아직 소스를 안 넣은 슬롯 (소스 없는 슬롯은 영상 테스트 카드가 자리를 대신함) */
+  private asCard(slot: Slot) {
+    return this.videoTest || !this.assets.get(slot.id)?.sprite;
+  }
+
   private drawNote(g: CanvasRenderingContext2D, n: Note, beat: number, x: number, y: number, w: number, h: number) {
     const slot = this.slots.get(n.slot);
-    if (this.videoTest && slot) {
+    if (slot && this.asCard(slot)) {
       const rate = slot.videoFollowsPitch ? pitchRate(slot, n.pitch) : 1;
       return this.slotCard(g, slot, (this.elapsed(n, beat) * rate) / Math.min(4, slotAudioDur(slot)), x, y, w, h);
     }
@@ -326,12 +331,11 @@ export class Renderer {
     // clipAt 이 있으면 컷 시작 때 클립의 그 위치(박)부터. 아니면 흐름 시작(또는 컷마다 처음)부터
     const t0 = shot.clipAt != null ? shot.start - shot.clipAt : slot.shotRestart ? shot.start : run.start;
     const t1 = shot.clipAt != null ? t0 + slotAudioDur(slot) / spb(this.tpl) : slot.shotRestart ? shot.end : run.end;
-    if (this.videoTest) {
+    const sp = this.assets.get(slot.id)?.sprite;
+    if (this.videoTest || !sp) {
       this.drawCard(g, this.shotLabel(shot), slot.color, (beat - t0) / (t1 - t0), x, y, w, h, shot.flip, shot.flipV);
       return true;
     }
-    const sp = this.assets.get(slot.id)?.sprite;
-    if (!sp) return false;
     g.save();
     if (shot.flip) {
       g.translate(2 * x + w, 0);
@@ -444,7 +448,8 @@ export class Renderer {
       scene.pip.forEach((sid, i) => {
         const slot = this.slots.get(sid);
         const sp = this.assets.get(sid)?.sprite;
-        if (!slot || (!sp && !this.videoTest)) return;
+        if (!slot) return;
+        const card = this.asCard(slot);
         const dur = Math.min(4, slotAudioDur(slot));
         const last = started.filter((n) => n.slot === sid && inScene(n)).pop();
         const tSec = last
@@ -457,7 +462,7 @@ export class Renderer {
             g.translate(W, 0);
             g.scale(-1, 1);
           }
-          if (this.videoTest) this.slotCard(g, slot, tSec / dur, W * 0.02, y, bw, bh);
+          if (card) this.slotCard(g, slot, tSec / dur, W * 0.02, y, bw, bh);
           else drawSpriteFrame(g, sp!, tSec * sp!.fps, W * 0.02, y, bw, bh);
           g.restore();
         }
@@ -567,12 +572,13 @@ export class Renderer {
       const pMin = Math.min(...all.map((n) => n.pitch));
       const pMax = Math.max(...all.map((n) => n.pitch));
       const sprite = this.assets.get(slot.id)?.sprite;
-      const hasVideo = this.videoTest ? !!slot.video : !!sprite;
+      const card = this.asCard(slot);
+      const hasVideo = !slot.noVideo; // 자막만 나오는 레이어 슬롯은 noVideo
       const L = letter(this.tpl.slots.indexOf(slot));
       const dur = Math.min(4, slotAudioDur(slot));
       const box = (n: Note, age: number, x: number, y: number, w: number, h: number, mirrored: boolean) => {
         const tSec = age * (slot.videoFollowsPitch ? pitchRate(slot, n.pitch) : 1);
-        if (this.videoTest) this.drawCard(g, L, slot.color, tSec / dur, x, y, w, h, mirrored);
+        if (card) this.drawCard(g, L, slot.color, tSec / dur, x, y, w, h, mirrored);
         else drawSpriteFrame(g, sprite!, tSec * sprite!.fps, x, y, w, h);
       };
       if (style === 'quad') {
@@ -602,7 +608,7 @@ export class Renderer {
         const eb = Math.min(1, e / (1 - BAND_LAG));
         const bx = bands ? bandX(eb, W, qx + W * 0.04, qx - W * 0.04, -W / 2) : qx;
         if (hasVideo && !(bands && eb >= 1)) {
-          if (this.videoTest) this.drawCard(g, L, slot.color, e, bx, qy, W / 2, H / 2);
+          if (card) this.drawCard(g, L, slot.color, e, bx, qy, W / 2, H / 2);
           else drawSpriteFrame(g, sprite!, age * sprite!.fps, bx, qy, W / 2, H / 2);
         }
         let text = slot.layerText || slot.label;
