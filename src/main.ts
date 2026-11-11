@@ -569,7 +569,7 @@ async function setupMode() {
   } catch {
     await load('template', DEFAULT_TEMPLATE);
   }
-  await setTestMode(localStorage.getItem('rtm.test') !== '0'); // 기본은 소리 테스트
+  await setTestMode(localStorage.getItem('rtm.test') === '1'); // 기본은 꺼짐
   setVideoTest(localStorage.getItem('rtm.videoTest') === '1');
   await refreshProjectList();
   requestAnimationFrame(frame);
