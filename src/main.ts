@@ -1,6 +1,6 @@
 import { auditionNote, createBuses, makeBeep, scheduleAll, type Mix, type Override } from './audio';
 import { backend, chooseBackend, modePref, setModePref, type ModePref } from './backend';
-import { fetchAudio, loadAllAssets, loadSlotAssets, type SlotAssets } from './media';
+import { fetchAudio, loadAllAssets, loadSlotAssets, spriteUse, type Sprite, type SlotAssets } from './media';
 import { downloadJson, getTemplate, listProjects, listTemplates, loadProject, pickJson, saveProject } from './store';
 import { YouTubeSync } from './youtube';
 import { PianoRoll } from './pianoroll';
@@ -487,38 +487,127 @@ window.addEventListener('keydown', async (e) => {
 window.addEventListener('beforeunload', (e) => { if (dirty) e.preventDefault(); });
 
 // ---------------- 내보내기 ----------------
+// 설정 고르기 → (원본 화질이면) 1차로 어떤 소스 프레임이 필요한지 모아 원본 화질로 준비 → 프레임마다 그려서 인코더로
+const EXPORT_PRESETS = [
+  { id: 'wuxga1610', name: '1920×1200 (16:10, 화면 꽉 채움)', W: 1920, H: 1200, rW: 1920, rH: 1200 },
+  { id: 'fhd169', name: '1920×1080 (16:9, 화면 꽉 채움)', W: 1920, H: 1080, rW: 1920, rH: 1080 },
+  { id: 'fhd169bars', name: '1920×1080 (16:9, 3:2 화면 + 양옆 검은 띠)', W: 1920, H: 1080, rW: 1620, rH: 1080 },
+  { id: 'fhd32', name: '1620×1080 (3:2 그대로)', W: 1620, H: 1080, rW: 1620, rH: 1080 },
+  { id: 'small', name: '960×640 (3:2, 빠른 확인용)', W: 960, H: 640, rW: 960, rH: 640 },
+];
 $('exportBtn').onclick = async () => {
   stop();
   const dlg = $<HTMLDialogElement>('exportDialog');
-  dlg.innerHTML = `<h3>🎬 mp4 내보내기</h3><div id="exMsg">오디오 렌더링 중…</div><div class="progress"><div id="exBar"></div></div><div class="actions"><span></span><button id="exClose">닫기</button></div>`;
+  const saved = JSON.parse(localStorage.getItem('rtm.export') ?? '{}');
+  dlg.innerHTML = `<h3>🎬 mp4 내보내기</h3>
+    <div class="row"><label>해상도 <select id="exRes">${EXPORT_PRESETS.map((p) => `<option value="${p.id}">${p.name}</option>`).join('')}</select></label></div>
+    <div class="row"><label>프레임 <select id="exFps"><option value="60">60fps</option><option value="30">30fps</option></select></label></div>
+    <div class="row"><label>소스 화질 <select id="exQ"><option value="hi">원본 화질 (다시 뽑음, 느림)</option><option value="lo">미리보기 화질 (빠름)</option></select></label></div>
+    <div class="actions"><span></span><div><button id="exCancel">취소</button> <button id="exGo" class="primary">내보내기</button></div></div>`;
+  $<HTMLSelectElement>('exRes').value = saved.res ?? 'wuxga1610';
+  $<HTMLSelectElement>('exFps').value = saved.fps ?? '60';
+  $<HTMLSelectElement>('exQ').value = saved.q ?? 'hi';
+  dlg.showModal();
+  $('exCancel').onclick = () => dlg.close();
+  $('exGo').onclick = () => {
+    const opt = { res: $<HTMLSelectElement>('exRes').value, fps: $<HTMLSelectElement>('exFps').value, q: $<HTMLSelectElement>('exQ').value };
+    localStorage.setItem('rtm.export', JSON.stringify(opt));
+    runExport(dlg, EXPORT_PRESETS.find((p) => p.id === opt.res)!, +opt.fps, opt.q === 'hi');
+  };
+};
+
+async function runExport(dlg: HTMLDialogElement, preset: (typeof EXPORT_PRESETS)[number], fps: number, hiQ: boolean) {
+  dlg.innerHTML = `<h3>🎬 mp4 내보내기 — ${preset.W}×${preset.H} ${fps}fps</h3><div id="exMsg">오디오 렌더링 중…</div><div class="progress"><div id="exBar"></div></div><div class="actions"><span></span><button id="exClose">닫기</button></div>`;
   let cancelled = false;
   $('exClose').onclick = () => { cancelled = true; dlg.close(); };
-  dlg.showModal();
+  const touched = new Set<Sprite>();
   try {
-    const { fps, width, height } = tpl.video;
     const t0 = beatToSec(tpl, tpl.range.start);
     const dur = beatToSec(tpl, tpl.range.end) - t0;
     const off = new OfflineAudioContext(2, Math.ceil((dur + 0.1) * 44100), 44100);
-    scheduleAll(off, createBuses(off, vol.songOn ? tpl.song.gain : 0, vol.synthOn ? vol.synth : 0), tpl, assets, song, tpl.range.start, 0, mix);
+    scheduleAll(off, createBuses(off, vol.songOn && !ytMode() ? tpl.song.gain : 0, vol.synthOn ? vol.synth : 0), tpl, assets, song, tpl.range.start, 0, mix);
     const mixed = await off.startRendering();
     const name = source.kind === 'project' ? source.name : 'rainbow-tylenol';
-    $('exMsg').textContent = '인코더 준비 중…';
-    const session = await backend.beginExport(name, fps, width, height, mixed);
-    const cv = document.createElement('canvas');
-    cv.width = width;
-    cv.height = height;
-    const g = cv.getContext('2d')!;
-    const r = new Renderer(tpl, assets);
+    // 그리는 크기로 맞춘 템플릿 (연출 위치·크기는 화면 비율로 정해져 있어서 그대로 따라옴)
+    const expTpl: Template = { ...tpl, video: { ...tpl.video, width: preset.rW, height: preset.rH, fps } };
+    const r = new Renderer(expTpl, assets);
     r.testMode = renderer.testMode;
     r.videoTest = renderer.videoTest;
     r.stealth = false; // 내보내기는 항상 진짜 글자로
     const total = Math.ceil(dur * fps);
+    const beatAt = (i: number) => secToBeat(tpl, t0 + i / fps);
+    const scratch = document.createElement('canvas');
+    scratch.width = preset.rW;
+    scratch.height = preset.rH;
+    const sg = scratch.getContext('2d')!;
+    /** 이 프레임에 필요한 (스프라이트, 프레임번호) — 그리지 않고 모으기만 */
+    const needsOf = (i: number) => {
+      const out: [Sprite, number][] = [];
+      spriteUse.collect = (sp, k) => out.push([sp, k]);
+      try { r.render(sg, beatAt(i)); } finally { spriteUse.collect = null; }
+      return out;
+    };
+    const loaders = new Map<Sprite, Map<number, () => Promise<ImageBitmap>>>();
+    if (hiQ && !r.videoTest) {
+      const need = new Map<Sprite, Set<number>>();
+      for (let i = 0; i < total; i++) {
+        for (const [sp, k] of needsOf(i)) (need.get(sp) ?? need.set(sp, new Set()).get(sp)!).add(k);
+        if (i % 60 === 0) $('exMsg').textContent = `필요한 소스 프레임 찾는 중… ${i + 1} / ${total}`;
+        if (cancelled) return;
+      }
+      let n = 0;
+      for (const [sp, set] of need) {
+        $('exMsg').textContent = `원본 화질 프레임 준비 중… (${++n} / ${need.size}) ${sp.src.file.split('/').pop()}`;
+        loaders.set(sp, await backend.hiFrames(sp, preset.rW, preset.rH, [...set]));
+        if (cancelled) return;
+      }
+    }
+    // 원본 화질 프레임은 그릴 때 필요한 것만 불러 두고, 최근 몇 장만 기억
+    const lastUse = new Map<Sprite, Map<number, number>>();
+    const ensureHi = async (i: number) => {
+      for (const [sp, k] of needsOf(i)) {
+        const ld = loaders.get(sp)?.get(k);
+        if (!ld) continue;
+        sp.hi ??= new Map();
+        touched.add(sp);
+        if (!sp.hi.has(k)) sp.hi.set(k, await ld());
+        (lastUse.get(sp) ?? lastUse.set(sp, new Map()).get(sp)!).set(k, i);
+      }
+      if (i % 30 === 0)
+        for (const sp of touched)
+          for (const [k, bm] of sp.hi ?? [])
+            if ((lastUse.get(sp)?.get(k) ?? -99) < i - 8) {
+              bm.close();
+              sp.hi!.delete(k);
+            }
+    };
+    $('exMsg').textContent = '인코더 준비 중…';
+    const session = await backend.beginExport(name, fps, preset.W, preset.H, mixed);
+    const cv = document.createElement('canvas');
+    cv.width = preset.rW;
+    cv.height = preset.rH;
+    const g = cv.getContext('2d')!;
+    const outCv = document.createElement('canvas');
+    outCv.width = preset.W;
+    outCv.height = preset.H;
+    const og = outCv.getContext('2d')!;
+    const started = performance.now();
     for (let i = 0; i < total; i++) {
       if (cancelled) return session.cancel();
-      r.render(g, secToBeat(tpl, t0 + i / fps));
-      await session.addFrame(cv, i);
+      if (loaders.size) await ensureHi(i);
+      r.render(g, beatAt(i));
+      // 그리는 크기와 출력 크기가 다르면 가운데 두고 양옆 검게
+      let frameCv = cv;
+      if (preset.rW !== preset.W || preset.rH !== preset.H) {
+        og.fillStyle = '#000';
+        og.fillRect(0, 0, preset.W, preset.H);
+        og.drawImage(cv, (preset.W - preset.rW) / 2, (preset.H - preset.rH) / 2);
+        frameCv = outCv;
+      }
+      await session.addFrame(frameCv, i);
       if (i % 5 === 0) {
-        $('exMsg').textContent = `프레임 ${i + 1} / ${total}`;
+        const left = (((performance.now() - started) / (i + 1)) * (total - i - 1)) / 1000;
+        $('exMsg').textContent = `프레임 ${i + 1} / ${total} · 남은 시간 약 ${Math.ceil(left / 60)}분`;
         $('exBar').style.width = `${((i + 1) / total) * 100}%`;
       }
     }
@@ -527,11 +616,17 @@ $('exportBtn').onclick = async () => {
     $('exBar').style.width = '100%';
     $('exMsg').innerHTML = `완성! <a href="${out.url}" download="${out.filename}">⬇ ${out.filename} 받기</a>` +
       (ytMode() ? '<br><small>유튜브 원곡은 mp4 에 넣을 수 없어서 빠졌어. 원곡을 넣으려면 원곡 파일을 골라 줘.</small>' : '') +
-      `<br><video src="${out.url}" controls autoplay style="margin-top:8px"></video>`;
+      `<br><video src="${out.url}" controls autoplay style="margin-top:8px;max-width:100%"></video>`;
   } catch (e) {
     $('exMsg').textContent = '실패: ' + (e as Error).message;
+  } finally {
+    spriteUse.collect = null;
+    for (const sp of touched) {
+      for (const bm of sp.hi?.values() ?? []) bm.close();
+      delete sp.hi;
+    }
   }
-};
+}
 
 // 콘솔 디버깅용
 (window as unknown as Record<string, unknown>).rtm = {

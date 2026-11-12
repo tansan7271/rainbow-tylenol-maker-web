@@ -1,6 +1,7 @@
 // 화면 렌더러: renderFrame(beat) 는 시간에 대한 순수 함수라 미리보기와 내보내기가 같은 그림을 그린다.
 import { drawSpriteFrame, type SlotAssets } from './media';
 import { letter } from './stealth';
+import { fitAt, fitClipTime, partAnchor, partRange, shotFits } from './shotfit';
 import { midiName, pitchRate, slotAudioDur, spb, type Note, type Scene, type Shot, type Slot, type SubtitleGroup, type Template } from './types';
 
 const FONT = '"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif';
@@ -44,6 +45,8 @@ const EVENT_HOLD = 0.3;
 const EVENT_TUMBLE = 0.5; // exit: 'tumble' 이 시작되는 지점(이벤트 길이 비율)
 /** 3등분 띠 자막(layerTextStyle: 'bands'): 들어오는/나가는 구간 비율 */
 const BAND_IN = 0.15;
+/** 4분면 정상 재생 레이어의 slide 자막이 화면이 끝난 뒤 더 남는 시간(박) */
+const QUAD_TEXT_HOLD = 1.5;
 const BAND_OUT = 0.2;
 /** bands 레이어에서 박스가 자막보다 먼저 움직이는 시차(덩어리 길이 비율) */
 const BAND_LAG = 0.08;
@@ -273,6 +276,14 @@ export class Renderer {
     g.restore();
   }
 
+  /** 노트마다 영상 재생 속도: 정상 / 음높이 따라(고전 합필) / 노트 길이에 맞춤(노트가 끝날 때 클립도 끝나게). 소리와는 별개 */
+  private videoRate(slot: Slot, n: Note) {
+    const mode = slot.videoSpeed ?? (slot.videoFollowsPitch ? 'pitch' : 'normal');
+    if (mode === 'pitch') return pitchRate(slot, n.pitch);
+    if (mode === 'note') return slotAudioDur(slot) / Math.max(0.05, n.len * spb(this.tpl));
+    return 1;
+  }
+
   /** 카드로 그릴까: 영상 테스트이거나, 아직 소스를 안 넣은 슬롯 (소스 없는 슬롯은 영상 테스트 카드가 자리를 대신함) */
   private asCard(slot: Slot) {
     return this.videoTest || !this.assets.get(slot.id)?.sprite;
@@ -281,7 +292,7 @@ export class Renderer {
   private drawNote(g: CanvasRenderingContext2D, n: Note, beat: number, x: number, y: number, w: number, h: number) {
     const slot = this.slots.get(n.slot);
     if (slot && this.asCard(slot)) {
-      const rate = slot.videoFollowsPitch ? pitchRate(slot, n.pitch) : 1;
+      const rate = this.videoRate(slot, n);
       return this.slotCard(g, slot, (this.elapsed(n, beat) * rate) / Math.min(4, slotAudioDur(slot)), x, y, w, h);
     }
     const sp = this.assets.get(n.slot)?.sprite;
@@ -292,7 +303,7 @@ export class Renderer {
       g.globalAlpha = 1;
       return;
     }
-    const rate = slot.videoFollowsPitch ? pitchRate(slot, n.pitch) : 1;
+    const rate = this.videoRate(slot, n);
     drawSpriteFrame(g, sp, this.elapsed(n, beat) * rate * sp.fps, x, y, w, h);
   }
 
@@ -318,7 +329,7 @@ export class Renderer {
     const L = letter(this.tpl.slots.findIndex((s) => s.id === shot.slot));
     const run = this.shotRun(shot);
     const numbered = run.parts > 1 && !slot?.shotRestart; // 컷마다 처음부터면 흐름 번호 없이 A, A'
-    const num = shot.part ?? (numbered ? run.part : '');
+    const num = (slot?.clipAtOff ? undefined : shot.part) ?? (numbered ? run.part : '');
     return (slot ? L : '?') + num + (shot.flip ? "'" : '') + (shot.flipV ? '↕' : '');
   }
 
@@ -327,10 +338,57 @@ export class Renderer {
   private drawShot(g: CanvasRenderingContext2D, shot: Shot, beat: number, x: number, y: number, w: number, h: number) {
     const slot = this.slots.get(shot.slot);
     if (!slot) return false;
+    // 컷 길이에 맞춤 슬롯: 컷 안 노트 구간에 클립 처음~끝
+    const fit = slot.videoSpeed === 'shot' ? fitAt(shotFits(this.tpl), beat) : undefined;
+    if (fit) {
+      const ct = fitClipTime(fit, beat);
+      const fsp = this.assets.get(slot.id)?.sprite;
+      if (this.videoTest || !fsp) {
+        this.drawCard(g, this.shotLabel(shot), slot.color, ct / slotAudioDur(slot), x, y, w, h, shot.flip, shot.flipV);
+        return true;
+      }
+      g.save();
+      if (shot.flip) {
+        g.translate(2 * x + w, 0);
+        g.scale(-1, 1);
+      }
+      if (shot.flipV) {
+        g.translate(0, 2 * y + h);
+        g.scale(1, -1);
+      }
+      drawSpriteFrame(g, fsp, ct * fsp.fps, x, y, w, h);
+      g.restore();
+      return true;
+    }
+    // 조각별 구간: 이 컷은 클립의 그 부분부터 정상 속도로
+    const pr = slot.parts ? partRange(this.tpl, slot, shot) : null;
+    if (pr) {
+      // 컷 안 첫 노트가 울릴 때부터 조각을 재생 (그 전엔 조각 첫 화면)
+      const ct = Math.min(pr[1], pr[0] + Math.max(0, beat - partAnchor(this.tpl, shot)) * spb(this.tpl));
+      const psp = this.assets.get(slot.id)?.sprite;
+      if (this.videoTest || !psp) {
+        this.drawCard(g, this.shotLabel(shot), slot.color, ct / slotAudioDur(slot), x, y, w, h, shot.flip, shot.flipV);
+        return true;
+      }
+      g.save();
+      if (shot.flip) {
+        g.translate(2 * x + w, 0);
+        g.scale(-1, 1);
+      }
+      if (shot.flipV) {
+        g.translate(0, 2 * y + h);
+        g.scale(1, -1);
+      }
+      drawSpriteFrame(g, psp, ct * psp.fps, x, y, w, h);
+      g.restore();
+      return true;
+    }
     const run = this.shotRun(shot);
     // clipAt 이 있으면 컷 시작 때 클립의 그 위치(박)부터. 아니면 흐름 시작(또는 컷마다 처음)부터
-    const t0 = shot.clipAt != null ? shot.start - shot.clipAt : slot.shotRestart ? shot.start : run.start;
-    const t1 = shot.clipAt != null ? t0 + slotAudioDur(slot) / spb(this.tpl) : slot.shotRestart ? shot.end : run.end;
+    // clipAtOff: 같은 대사 다시 틀기(clipAt) 없이 흐름대로 이어서
+    const clipAt = slot.clipAtOff ? undefined : shot.clipAt;
+    const t0 = clipAt != null ? shot.start - clipAt : slot.shotRestart ? shot.start : run.start;
+    const t1 = clipAt != null ? t0 + slotAudioDur(slot) / spb(this.tpl) : slot.shotRestart ? shot.end : run.end;
     const sp = this.assets.get(slot.id)?.sprite;
     if (this.videoTest || !sp) {
       this.drawCard(g, this.shotLabel(shot), slot.color, (beat - t0) / (t1 - t0), x, y, w, h, shot.flip, shot.flipV);
@@ -453,7 +511,7 @@ export class Renderer {
         const dur = Math.min(4, slotAudioDur(slot));
         const last = started.filter((n) => n.slot === sid && inScene(n)).pop();
         const tSec = last
-          ? this.elapsed(last, beat) * (slot.videoFollowsPitch ? pitchRate(slot, last.pitch) : 1)
+          ? this.elapsed(last, beat) * this.videoRate(slot, last)
           : ((((beat - scene.start) * spb(this.tpl)) % dur) + dur) % dur;
         for (const side of [0, 1]) {
           const y = H * (0.42 + (i % 2) * 0.03);
@@ -577,7 +635,7 @@ export class Renderer {
       const L = letter(this.tpl.slots.indexOf(slot));
       const dur = Math.min(4, slotAudioDur(slot));
       const box = (n: Note, age: number, x: number, y: number, w: number, h: number, mirrored: boolean) => {
-        const tSec = age * (slot.videoFollowsPitch ? pitchRate(slot, n.pitch) : 1);
+        const tSec = age * this.videoRate(slot, n);
         if (card) this.drawCard(g, L, slot.color, tSec / dur, x, y, w, h, mirrored);
         else drawSpriteFrame(g, sprite!, tSec * sprite!.fps, x, y, w, h);
       };
@@ -596,9 +654,12 @@ export class Renderer {
         runs.push([r0.beat, rEnd]);
         // 덩어리 길이는 클립 길이까지만 (정상 재생 한 번)
         const clipBeats = slotAudioDur(slot) / sp1;
-        const run = runs.map(([a, b]): [number, number] => [a, Math.min(b, a + clipBeats)]).find(([a, b]) => a <= beat + 1e-6 && beat < b);
+        // slide 자막은 화면이 끝난 뒤에도 QUAD_TEXT_HOLD 박 더 남아서 읽을 시간을 줌
+        const hold = slot.layerTextStyle === 'bands' ? 0 : QUAD_TEXT_HOLD;
+        const run = runs.map(([a, b]): [number, number] => [a, Math.min(b, a + clipBeats)]).find(([a, b]) => a <= beat + 1e-6 && beat < b + hold);
         if (!run) continue;
-        const e = (beat - run[0]) / (run[1] - run[0]);
+        const inRun = beat < run[1];
+        const e = Math.min(1, (beat - run[0]) / (run[1] - run[0]));
         const age = (beat - run[0]) * sp1;
         const q = slot.layerQuad ?? 'bl';
         const qx = q[1] === 'r' ? W / 2 : 0;
@@ -607,7 +668,7 @@ export class Renderer {
         // bands: 박스도 자막처럼 오른쪽 밖 → 제자리 → 왼쪽 밖으로 흐름. 자막보다 BAND_LAG 만큼 먼저
         const eb = Math.min(1, e / (1 - BAND_LAG));
         const bx = bands ? bandX(eb, W, qx + W * 0.04, qx - W * 0.04, -W / 2) : qx;
-        if (hasVideo && !(bands && eb >= 1)) {
+        if (hasVideo && inRun && !(bands && eb >= 1)) {
           if (card) this.drawCard(g, L, slot.color, e, bx, qy, W / 2, H / 2);
           else drawSpriteFrame(g, sprite!, age * sprite!.fps, bx, qy, W / 2, H / 2);
         }
@@ -637,9 +698,11 @@ export class Renderer {
           // 박스 위(위쪽 4분면이면 아래)에서 나타나 오른쪽으로 미끄러지며 사라짐
           g.save();
           g.textAlign = 'left';
-          const alpha = Math.min(1, e / 0.06) * (1 - e * e);
+          // 자막 시간 = 화면 길이 + 남는 시간. 앞 70% 는 또렷하게, 뒤 30% 동안 사라짐
+          const tE = (beat - run[0]) / (run[1] - run[0] + hold);
+          const alpha = Math.min(1, tE / 0.04) * (tE < 0.7 ? 1 : Math.max(0, 1 - (tE - 0.7) / 0.3));
           const ty = qy > 0 ? qy - H * 0.05 : qy + H / 2 + H * 0.05;
-          outlined(g, text, qx + W * (0.03 + 0.3 * e), ty, H * 0.06, '#fff', alpha);
+          outlined(g, text, qx + W * (0.03 + 0.25 * tE), ty, H * 0.06, '#fff', alpha);
           g.restore();
         }
         continue;
@@ -772,8 +835,21 @@ export class Renderer {
       const field = ev.field ? this.tpl.textFields?.find((f) => f.id === ev.field) : undefined;
       const full = field ? field.text : ev.text ?? '';
       let text = ev.unit != null ? textUnits(full)[ev.unit] ?? '' : full;
+      // 칸 하나를 여러 번 쓰는 자막인데 '/' 로 나눠 적었으면 나오는 순서대로 한 조각씩 (예: "하늘/에서")
+      let occ = -1;
+      if (field && ev.unit == null && full.includes('/')) {
+        const same = (this.tpl.texts ?? []).filter((x) => x.field === ev.field && x.unit == null).sort((a, b) => a.start - b.start);
+        occ = same.indexOf(ev);
+        const parts = full.split('/');
+        text = parts[occ % parts.length] ?? '';
+      }
       if (!text.trim()) continue;
       if (ev.unit != null && !ev.literal && (this.videoTest || this.stealth)) text = placeholder(ev.unit); // 묶음 안 순서대로 가나다
+      if (occ >= 0 && !ev.literal && (this.videoTest || this.stealth)) {
+        let i = 0;
+        const base = occ * 4; // 조각마다 다른 글자로 (가나 / 마바 …)
+        text = text.replace(/\S/g, () => placeholder(base + i++));
+      }
       if (ev.anim === 'static') {
         // 고정 자막: 움직임·외곽선 없이 그 자리에 (literal 이면 영상 테스트·위장 표시에서도 그대로)
         if (!ev.literal && (this.videoTest || this.stealth)) {
@@ -976,16 +1052,17 @@ export class Renderer {
     return slot.label || '가';
   }
 
-  /** 이 슬롯 노트가 자막에 나오나 (noSub 면 안 나옴) */
+  /** 이 슬롯 노트가 자막에 나오나: noSub 가 있으면 그걸로, 없으면 예전처럼 글자가 있을 때만 */
   private hasSub(id: string) {
     const s = this.slots.get(id);
-    return !!s && !s.noSub;
+    if (!s) return false;
+    return s.noSub != null ? !s.noSub : !!s.label;
   }
 
-  /** 노트의 자막 글자: 영상 테스트·글자 비움 → 자리표시(가나다…), 위장 표시 → 파트 글자, 아니면 슬롯 글자 */
+  /** 노트의 자막 글자: 영상 테스트·글자 비움(noSub=false) → 자리표시(가나다…), 위장 표시 → 파트 글자, 아니면 슬롯 글자 */
   private label(n: Note) {
     const s = this.slots.get(n.slot);
-    if (!s || s.noSub) return '';
+    if (!s || !this.hasSub(n.slot)) return '';
     if (this.videoTest || !s.label.trim()) return this.ph.get(n.id) ?? '가';
     if (this.stealth) return letter(this.tpl.slots.indexOf(s));
     return s.label;

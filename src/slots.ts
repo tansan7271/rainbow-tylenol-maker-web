@@ -3,6 +3,7 @@ import { backend } from './backend';
 import { detectPitch } from './audio';
 import { drawSpriteFrame, fetchAudio, type SlotAssets } from './media';
 import { shownLabel, shownName, stealth } from './stealth';
+import { shotPart } from './shotfit';
 import { midiName, uid, type Slot, type Template } from './types';
 
 export interface SlotHost {
@@ -118,8 +119,12 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
   const s: Slot = structuredClone(orig);
   let files = await listFiles(true);
   type AudioMode = 'same' | 'other' | 'none';
-  let audioMode: AudioMode = !s.audio ? 'none' : s.video && s.audio.file === s.video.file && Math.abs(s.audio.inSec - s.video.inSec) < 1e-3 ? 'same' : 'other';
-  if (!s.audio) s.audio = { file: s.video?.file ?? files[0] ?? '', inSec: s.video?.inSec ?? 0, outSec: (s.video?.inSec ?? 0) + 0.4 };
+  // 소스가 하나도 없는 빈 슬롯이면 기본은 "영상과 같은 소리" (영상만 있는 슬롯은 원래대로 소리 없음)
+  let audioMode: AudioMode = !s.audio
+    ? s.video ? 'none' : 'same'
+    : s.video && s.audio.file === s.video.file && Math.abs(s.audio.inSec - s.video.inSec) < 1e-3 ? 'same' : 'other';
+  // 소리 길이 기본값: 규격의 권장 길이(audioSec)가 있으면 그것
+  if (!s.audio) s.audio = { file: s.video?.file ?? files[0] ?? '', inSec: s.video?.inSec ?? 0, outSec: (s.video?.inSec ?? 0) + (s.audioSec ?? 0.4) };
   const audio = s.audio;
 
   dlg.innerHTML = '';
@@ -135,7 +140,7 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
   // --- 기본 정보 ---
   const nameIn = h('input', { type: 'text', value: s.name });
   const labelIn = h('input', { type: 'text', value: s.label, placeholder: '비우면 기본 자막(가나다)' });
-  const noSubChk = h('input', { type: 'checkbox', checked: !!s.noSub });
+  const noSubChk = h('input', { type: 'checkbox', checked: s.noSub ?? !s.label });
   const colorIn = h('input', { type: 'color', value: s.color });
 
   // --- 영상 ---
@@ -144,7 +149,7 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
   const vIn = num(s.video?.inSec ?? 0);
   const vSetBtn = h('button', { textContent: '⏺ 지금 위치를 시작점으로' });
   const loadV = async () => { await setSrc(vPlayer, vSel.value); if (vSel.value) vPlayer.currentTime = +vIn.value; };
-  // 소스 파일 추가: 추가한 첫 파일을 영상(과 소리)으로 바로 고름
+  // 소스 파일 추가: 추가한 첫 파일을 바로 고름
   const addFileBtn = h('button', { textContent: '📁 파일 추가…' });
   addFileBtn.onclick = async () => {
     const added = await pickFiles();
@@ -167,6 +172,14 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
     h('option', { value: 'none', textContent: '소리 없음 (영상만)' }),
   );
   modeSel.value = audioMode;
+  // 영상과 소리는 한 소스·한 구간으로 다룸. 예전에 소리를 다른 파일에서 가져온 슬롯만 옛 메뉴를 보여 줌
+  const legacyOther = audioMode === 'other';
+  const noSoundChk = h('input', { type: 'checkbox', checked: audioMode === 'none' });
+  noSoundChk.onchange = () => {
+    modeSel.value = noSoundChk.checked ? 'none' : 'same';
+    refreshMode();
+  };
+  const vInRow = h('div', { className: 'row' });
   const aSel = fileSelect(audio.file, false);
   const aPlayer = h('video', { controls: true, preload: 'auto' });
   aPlayer.style.maxHeight = '120px';
@@ -184,16 +197,124 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
   const pitchIn = num(s.basePitch, 0.1);
   const pitchName = h('span', { textContent: midiName(s.basePitch) });
   const detectBtn = h('button', { textContent: '🎵 자동 감지' });
-  const gainIn = h('input', { type: 'range', min: '0', max: '3', step: '0.05', value: String(s.gain) });
+  const gainIn = h('input', { type: 'range', min: '0', max: '4', step: '0.05', value: String(s.gain) });
+  const normChk = h('input', { type: 'checkbox', checked: !!s.normalize });
   const gateSel = h('select', {}, h('option', { value: 'gate', textContent: '노트 길이만큼 (gate)' }), h('option', { value: 'oneshot', textContent: '클립 끝까지 (oneshot)' }));
   gateSel.value = s.mode;
-  const followChk = h('input', { type: 'checkbox', checked: s.videoFollowsPitch });
+  const speedSel = h('select', {},
+    h('option', { value: 'normal', textContent: '영상 정상 속도' }),
+    h('option', { value: 'pitch', textContent: '영상 속도 = 음높이 따라 (음이 높으면 빨라짐)' }),
+    h('option', { value: 'note', textContent: '영상·소리 = 노트 길이에 맞춤 (클립 전체를 노트 안에 빨리 감아서, 음높이는 노트대로)' }),
+    h('option', { value: 'shot', textContent: '영상·소리 = 컷 길이에 맞춤 (이 슬롯 컷 안 노트들에 클립 처음~끝, 오토튠처럼)' }),
+  );
+  speedSel.value = s.videoSpeed ?? (s.videoFollowsPitch ? 'pitch' : 'normal');
+  // 조각별 구간: 이 슬롯이 C1 C2' C3… 처럼 이어진 컷으로 나오면, 조각마다 클립의 어디를 쓸지 (클립 시작 기준 초)
+  const partNos = [...new Set((host.tpl().shots ?? []).filter((x) => x.slot === s.id && !x.over).map((x) => shotPart(host.tpl(), x)))].sort((a, b) => a - b);
+  const partsBox = h('div');
+  const partIns = new Map<number, [HTMLInputElement, HTMLInputElement]>();
+  if (partNos.length > 1) {
+    partsBox.append(h('div', { className: 'hint', textContent: '조각별 구간 — 이어진 컷의 n번째 조각이 클립의 어디를 쓸지 (클립 시작 기준 초, 비우면 이어서 재생). ⏺ = 플레이어의 지금 위치' }));
+    for (const k of partNos) {
+      const p = s.parts?.[k];
+      const a = h('input', { type: 'number', step: '0.01', value: p ? String(p.at) : '', placeholder: '시작' });
+      const b = h('input', { type: 'number', step: '0.01', value: p?.end != null ? String(p.end) : '', placeholder: '끝(선택)' });
+      a.style.width = b.style.width = '80px';
+      const here = (inp: HTMLInputElement) => () => (inp.value = String(+Math.max(0, vPlayer.currentTime - +vIn.value).toFixed(2)));
+      const aBtn = h('button', { className: 'small', textContent: '⏺' });
+      aBtn.onclick = here(a);
+      const bBtn = h('button', { className: 'small', textContent: '⏺' });
+      bBtn.onclick = here(b);
+      const play = h('button', { className: 'small', textContent: '▶' });
+      play.onclick = () => {
+        if (a.value === '') return;
+        vPlayer.currentTime = +vIn.value + +a.value;
+        vPlayer.play();
+        const stopAt = b.value !== '' ? +vIn.value + +b.value : null;
+        if (stopAt != null) {
+          const chk = () => (vPlayer.currentTime >= stopAt ? vPlayer.pause() : requestAnimationFrame(chk));
+          requestAnimationFrame(chk);
+        }
+      };
+      partIns.set(k, [a, b]);
+      partsBox.append(h('div', { className: 'row' }, `조각 ${k} `, a, aBtn, ' ~ ', b, bBtn, play));
+    }
+  }
+  // 음정 입히기 (음정이 뚜렷하지 않은 말소리를 음악처럼)
+  const fxSel = h('select', { title: '말소리처럼 음정이 뚜렷하지 않은 클립에 노트 음을 강제로 입힘' },
+    h('option', { value: 'none', textContent: '음정 입히기 없음' }),
+    h('option', { value: 'vocoder', textContent: '보코더 (로봇이 노래하듯, 음정 정확)' }),
+    h('option', { value: 'resonance', textContent: '공명 (목소리 위로 음이 울림)' }),
+    h('option', { value: 'autotune', textContent: '오토튠 (목소리 음높이를 노트에 고정)' }),
+  );
+  fxSel.value = s.pitchFx ?? 'none';
+  const fxAmt = h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(s.pitchFxAmount ?? (s.pitchFx === 'resonance' ? 0.6 : 0.9)), title: '세기' });
+  const fxAmtBox = h('label', {}, '세기 ', fxAmt);
+  // 다른 슬롯 소리를 빌려 쓰는 슬롯: 빌리지 않고 이 슬롯 자기 클립을 쓰게 분리
+  const lender = s.audioFrom ? host.tpl().slots.find((x) => x.id === s.audioFrom) : undefined;
+  const unborrowChk = h('input', { type: 'checkbox' });
+  const unborrowBox = h('label', { title: '지금은 다른 슬롯의 클립을 빌려 씀. 체크하고 저장하면 이 슬롯 자기 클립(위 소스)을 쓰고, 이 슬롯 노트만 나오는 컷 화면도 이 슬롯으로 바뀜' },
+    unborrowChk, `${lender ? `“${lender.name}”` : '다른 슬롯'} 소리·화면 빌리지 않고 이 슬롯 클립 쓰기`);
+  if (!lender) unborrowBox.style.display = 'none';
+  // 4분면 정상 재생 레이어(F·H)의 소리 방식
+  const quadSel = h('select', { title: '화면 위 4분면에서 정상 재생되는 레이어 슬롯의 소리' },
+    h('option', { value: 'once', textContent: '레이어 소리: 원래대로 한 번 길게' }),
+    h('option', { value: 'melody', textContent: '레이어 소리: 끊지 않고 길게 + 노트마다 멜로디 음' }),
+  );
+  quadSel.value = s.quadSound ?? 'once';
+  if (s.layer !== 'quad') quadSel.style.display = 'none';
+  // 공간감·부드럽게 (뒤쪽 화음처럼 들리게, 거친 목소리 누그러뜨리기)
+  const rvIn = h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(s.reverb ?? 0) });
+  const softIn = h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(s.soften ?? 0) });
+  const spaceRow = h('div', { className: 'row' },
+    h('label', { title: '리버브: 높일수록 멀리서 울리는 소리 (원래 소리는 뒤로)' }, '공간감 ', rvIn),
+    h('label', { title: '고음을 깎아 거친 소리를 부드럽게' }, ' 부드럽게 ', softIn));
+  // 뒤쪽 루프에서만 따로 (예: 앞 루프는 그대로, 뒤 루프 배경만 오토튠 살짝)
+  const split = host.tpl().loopSplit;
+  const fx2Sel = h('select', { title: '뒤쪽 루프에서만 다른 음정 입히기' },
+    h('option', { value: '', textContent: '앞과 같음' }),
+    h('option', { value: 'none', textContent: '없음' }),
+    h('option', { value: 'vocoder', textContent: '보코더' }),
+    h('option', { value: 'resonance', textContent: '공명' }),
+    h('option', { value: 'autotune', textContent: '오토튠' }),
+  );
+  fx2Sel.value = s.pitchFx2 ?? '';
+  const fx2Amt = h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(s.pitchFxAmount2 ?? 0.5), title: '세기' });
+  const fx2AmtBox = h('label', {}, '세기 ', fx2Amt);
+  const syncFx2 = () => (fx2AmtBox.style.display = fx2Sel.value === '' || fx2Sel.value === 'none' ? 'none' : '');
+  fx2Sel.onchange = syncFx2;
+  syncFx2();
+  const T = host.tpl();
+  const splitF = split != null ? Math.round(((split - T.range.start) * 60 * T.video.fps) / T.bpm) : 0;
+  const tr2In = h('input', { type: 'number', step: '1', min: '-24', max: '24', value: s.transpose2 != null ? String(s.transpose2) : '', placeholder: '같음' });
+  tr2In.style.width = '56px';
+  const fx2Row = h('div', { className: 'row' }, `뒤쪽 루프(F${splitF}~)에서는 `, fx2Sel, fx2AmtBox,
+    h('label', { title: '뒤쪽 루프에서만 소리 높이 (반음). 비우면 앞과 같음' }, ' 소리 높이 ', tr2In, '반음'));
+  if (split == null) fx2Row.style.display = 'none';
+  // 이 슬롯 소리만 옥타브/반음 이동 (목소리가 너무 높거나 낮을 때)
+  const trIn = h('input', { type: 'number', step: '1', min: '-24', max: '24', value: String(s.transpose ?? 0) });
+  trIn.style.width = '56px';
+  const trDown = h('button', { className: 'small', textContent: '−12' });
+  trDown.onclick = () => (trIn.value = String(Math.max(-24, +trIn.value - 12)));
+  const trUp = h('button', { className: 'small', textContent: '+12' });
+  trUp.onclick = () => (trIn.value = String(Math.min(24, +trIn.value + 12)));
+  const trBox = h('label', { title: '이 슬롯 소리만 노트보다 반음 단위로 올리거나 내림 (-12 = 한 옥타브 아래). 노트·화면은 그대로' }, '소리 높이 ', trIn, '반음 ', trDown, trUp);
+  const syncFx = () => (fxAmtBox.style.display = fxSel.value === 'none' ? 'none' : '');
+  fxSel.onchange = () => {
+    fxAmt.value = fxSel.value === 'resonance' ? '0.6' : fxSel.value === 'autotune' ? '1' : '0.9';
+    syncFx();
+  };
+  syncFx();
   const backingChk = h('input', { type: 'checkbox', checked: s.role === 'backing' });
   const overlayChk = h('input', { type: 'checkbox', checked: s.role === 'overlay' });
   backingChk.onchange = () => { if (backingChk.checked) overlayChk.checked = false; };
   overlayChk.onchange = () => { if (overlayChk.checked) backingChk.checked = false; };
   const restartChk = h('input', { type: 'checkbox', checked: !!s.shotRestart });
   const tuneChk = h('input', { type: 'checkbox', checked: !!s.audioTune });
+  // 틀에 "같은 대사 다시 틀기"가 있는 슬롯(J 같은)만: 끄고 이어서 재생
+  const hasClipAt = (host.tpl().shots ?? []).some((x) => x.slot === s.id && x.clipAt != null) || host.tpl().notes.some((n) => n.slot === s.id && n.clipAt != null);
+  const clipAtOffChk = h('input', { type: 'checkbox', checked: !!s.clipAtOff });
+  const clipAtOffBox = h('label', { title: '틀에서는 같은 대사를 두 번 다시 트는 자리인데, 내 클립은 다시 틀지 않고 이어서 재생' }, clipAtOffChk, '같은 대사 다시 틀기 끄기 (이어서 재생)');
+  if (!hasClipAt) clipAtOffBox.style.display = 'none';
 
   const activePlayer = () => (audioMode === 'other' ? aPlayer : vPlayer);
   const audioFile = () => (audioMode === 'other' ? aSel.value : vSel.value);
@@ -277,14 +398,14 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
   wave.onpointerup = () => (waveDrag = null);
   vPlayer.ontimeupdate = aPlayer.ontimeupdate = () => drawWave();
 
-  const syncLinked = () => { if (audioMode === 'same') vIn.value = aIn.value; };
+  const syncLinked = () => { if (audioMode !== 'other') vIn.value = aIn.value; };
   const refreshMode = () => {
     audioMode = modeSel.value as AudioMode;
     otherBox.style.display = audioMode === 'other' ? '' : 'none';
     aPlayerBox.style.display = audioMode === 'other' ? '' : 'none';
-    vIn.disabled = audioMode === 'same';
-    vSetBtn.style.display = audioMode === 'same' ? 'none' : '';
-    if (audioMode === 'same') {
+    vInRow.style.display = audioMode === 'other' ? '' : 'none';
+    modeSel.style.display = legacyOther ? '' : 'none';
+    if (audioMode !== 'other') {
       const d = +aOut.value - +aIn.value;
       aIn.value = vIn.value;
       aOut.value = String(+(+vIn.value + d).toFixed(3));
@@ -357,29 +478,36 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
     h('h3', { textContent: isNew ? '새 슬롯' : `슬롯 편집 — ${s.name}` }),
     h('fieldset', {}, h('legend', { textContent: '기본' }),
       h('label', {}, '이름 ', nameIn), h('label', {}, '자막 글자 ', labelIn), h('label', {}, noSubChk, '자막 없음'), h('label', {}, '색 ', colorIn)),
-    h('fieldset', {}, h('legend', { textContent: '영상' }),
-      h('div', { className: 'row' }, '영상 파일 ', vSel, refreshFiles, addFileBtn),
+    h('fieldset', {}, h('legend', { textContent: '소스 (영상 + 소리)' }),
+      h('div', { className: 'row' }, '파일 ', vSel, refreshFiles, addFileBtn),
       h('div', { className: 'row' }, vPlayer),
-      h('div', { className: 'row' }, '영상 시작점(초) ', vIn, vSetBtn),
-      h('label', { title: '화면 컷이 C1 C2\' C3…처럼 이어질 때, 한 클립을 쭉 이어 틀지(기본) 컷마다 처음부터 다시 틀지' }, restartChk, '이어지는 컷에서도 컷마다 처음부터'),
-    ),
-    h('fieldset', {}, h('legend', { textContent: '소리' }),
-      h('div', { className: 'row' }, modeSel),
-      otherBox, aPlayerBox,
       h('div', { className: 'row' }, '구간 ', aIn, aInBtn, ' ~ ', aOut, aOutBtn, durDisp, playClipBtn),
       wave,
-      h('div', { className: 'hint', textContent: '파형의 분홍 선을 끌어서 자르기 · 파형 클릭 = 플레이어 위치 이동 · 플레이어로 듣다가 ⏺ 버튼으로 찍어도 돼' }),
+      h('div', { className: 'hint', textContent: '영상과 소리는 같은 구간을 씀 · 파형의 분홍 선을 끌어서 자르기 · 파형 클릭 = 플레이어 위치 이동 · 플레이어로 보다가 ⏺ 버튼으로 찍어도 돼' }),
+      h('div', { className: 'row' }, h('label', { title: '영상만 쓰고 소리는 안 냄 (화면 전용 슬롯)' }, noSoundChk, '소리 없음 (영상만)'), modeSel),
+      otherBox, aPlayerBox,
+      vInRow,
+      h('label', { title: '화면 컷이 C1 C2\' C3…처럼 이어질 때, 한 클립을 쭉 이어 틀지(기본) 컷마다 처음부터 다시 틀지' }, restartChk, '이어지는 컷에서도 컷마다 처음부터'),
+      unborrowBox,
+      clipAtOffBox,
+      partsBox,
     ),
     h('fieldset', {}, h('legend', { textContent: '연주' }),
       h('label', {}, '기준 음정(MIDI) ', pitchIn, pitchName), detectBtn,
-      h('label', {}, '볼륨 ', gainIn), gateSel,
-      h('label', {}, followChk, '음이 높으면 영상도 빨라짐'),
+      h('label', {}, '볼륨 ', gainIn), h('label', { title: '클립 소리 크기를 일정하게 맞춤 (조용한 클립을 키우되 깨지지 않게)' }, normChk, '소리 크기 자동 맞춤'), gateSel,
+      speedSel,
+      h('div', { className: 'row' }, fxSel, fxAmtBox),
+      quadSel,
+      spaceRow,
+      fx2Row,
+      trBox,
       h('label', { title: '소리만 나고 메인 화면/자막은 안 바꿈 (베이스 같은 반주용)' }, backingChk, '반주 파트'),
       h('label', { title: '이어진 노트들이 클립을 처음부터가 아니라 이어서 틀고 음높이만 노트를 따라감 (말소리가 멜로디를 타는 느낌)' }, tuneChk, '오토튠처럼 (이어서 재생)'),
       h('label', { title: '소리 + 노트마다 좌우에 깜빡이는 작은 화면(음이 높으면 위) + 자체 자막. 메인 화면/자막은 안 바꿈' }, overlayChk, '추가 레이어'),
     ),
     h('div', { className: 'actions' }, del, h('div', {}, cancel, ' ', save)),
   );
+  vInRow.append('영상 시작점(초) ', vIn, vSetBtn);
   loadV();
   refreshMode();
 
@@ -393,8 +521,7 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
   save.onclick = async () => {
     s.name = nameIn.value || s.name;
     s.label = labelIn.value;
-    if (noSubChk.checked) s.noSub = true;
-    else delete s.noSub;
+    s.noSub = noSubChk.checked;
     s.color = colorIn.value;
     const keepDur = s.video?.durSec; // 소리가 있어도 영상만 길게 지정해 둔 길이는 유지
     s.video = vSel.value ? { file: vSel.value, inSec: +vIn.value, ...(keepDur ? { durSec: keepDur } : {}) } : null;
@@ -408,7 +535,55 @@ export async function openSlotEditor(host: SlotHost, dlg: HTMLDialogElement, ori
     s.basePitch = +pitchIn.value;
     s.gain = +gainIn.value;
     s.mode = gateSel.value as Slot['mode'];
-    s.videoFollowsPitch = followChk.checked;
+    s.videoSpeed = speedSel.value as NonNullable<Slot['videoSpeed']>;
+    if (unborrowChk.checked && s.audioFrom) {
+      // 빌려 온 슬롯의 컷 중, 안에서 울리는 노트가 전부 이 슬롯 것인 컷은 화면도 이 슬롯으로
+      host.beginEdit(); // 컷을 바꾸기 전에 되돌리기 지점
+      const T = host.tpl();
+      const from = s.audioFrom;
+      const roleOf = (id: string) => T.slots.find((x) => x.id === id)?.role;
+      for (const sh of T.shots ?? []) {
+        if (sh.slot !== from || sh.over) continue;
+        const ns = T.notes.filter((n) => n.beat >= sh.start - 1e-6 && n.beat < sh.end - 1e-6 && roleOf(n.slot) !== 'backing' && roleOf(n.slot) !== 'overlay');
+        if (ns.length && ns.every((n) => n.slot === s.id)) sh.slot = s.id;
+      }
+      delete s.audioFrom;
+      delete s.audioFromAt;
+    }
+    if (clipAtOffChk.checked) s.clipAtOff = true;
+    else delete s.clipAtOff;
+    if (s.layer === 'quad') s.quadSound = quadSel.value as 'once' | 'melody';
+    if (normChk.checked) s.normalize = true;
+    else delete s.normalize;
+    if (+rvIn.value) s.reverb = +rvIn.value;
+    else delete s.reverb;
+    if (+softIn.value) s.soften = +softIn.value;
+    else delete s.soften;
+    if (fx2Sel.value) {
+      s.pitchFx2 = fx2Sel.value as NonNullable<Slot['pitchFx2']>;
+      s.pitchFxAmount2 = +fx2Amt.value;
+    } else {
+      delete s.pitchFx2;
+      delete s.pitchFxAmount2;
+    }
+    if (tr2In.value !== '') s.transpose2 = Math.round(+tr2In.value);
+    else delete s.transpose2;
+    if (+trIn.value) s.transpose = Math.round(+trIn.value);
+    else delete s.transpose;
+    if (partIns.size) {
+      const parts: NonNullable<Slot['parts']> = {};
+      for (const [k, [a, b]] of partIns) if (a.value !== '') parts[k] = { at: +a.value, ...(b.value !== '' ? { end: +b.value } : {}) };
+      if (Object.keys(parts).length) s.parts = parts;
+      else delete s.parts;
+    }
+    if (fxSel.value === 'none') {
+      delete s.pitchFx;
+      delete s.pitchFxAmount;
+    } else {
+      s.pitchFx = fxSel.value as NonNullable<Slot['pitchFx']>;
+      s.pitchFxAmount = +fxAmt.value;
+    }
+    s.videoFollowsPitch = s.videoSpeed === 'pitch';
     s.role = backingChk.checked ? 'backing' : overlayChk.checked ? 'overlay' : 'lead';
     if (tuneChk.checked) s.audioTune = true;
     else delete s.audioTune;

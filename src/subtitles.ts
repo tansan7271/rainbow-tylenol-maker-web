@@ -77,7 +77,8 @@ export function renderSubPanel(host: SubHost, el: HTMLElement) {
 
   // ---- 1) 하단 자막 묶음 ----
   const groups = tpl.subtitleGroups ?? [];
-  if (groups.length) {
+  const autoRows = implicitGroups(tpl);
+  if (groups.length || autoRows.length) {
     const list = section('하단 자막 묶음', "노트마다 한 글자씩 드러남 · '/' 로 끊으면 조각마다 한 칸 · 비우면 슬롯 글자");
     groups.forEach((gr, i) => {
       if (gr.textFrom != null) return; // 반복 쪽은 원래 묶음 문장을 그대로 씀
@@ -88,6 +89,15 @@ export function renderSubPanel(host: SubHost, el: HTMLElement) {
       const label = `${span(gr.start, gr.end)}` + (reps.length ? ` (+반복 ${reps.map((x) => `F${F(x.start)}`).join(', ')})` : '');
       row(list, gr.start, gr.end, label, gr.text ?? '', host.slotsIn(gr), '비우면 슬롯 글자', (v) => edit(() => (gr.text = v)), ex);
     });
+    // 묶음을 따로 안 정한 하단 자막 구간 (마디 단위로 자동으로 쌓이는 곳). 글자를 적으면 그 구간이 새 묶음이 됨
+    for (const ag of autoRows) {
+      row(list, ag.start, ag.end, `${span(ag.start, ag.end)} (자동 묶음)`, '', host.slotsIn(ag), '비우면 슬롯 글자', (v) => {
+        if (!v.trim()) return;
+        // 끝에 덧붙임 (반복 묶음이 번호로 원래 묶음을 가리키고 있어서 순서를 바꾸면 안 됨)
+        edit(() => (tpl.subtitleGroups = [...(tpl.subtitleGroups ?? []), { ...ag, text: v }]));
+        renderSubPanel(host, el);
+      });
+    }
   }
 
   // ---- 2) 화면 위 레이어 자막 (슬롯에 붙은 것) ----
@@ -127,7 +137,8 @@ export function renderSubPanel(host: SubHost, el: HTMLElement) {
       const need = units.length ? Math.max(...units) + 1 : null;
       const a = Math.min(...evs.map((e) => e.start));
       const b = Math.max(...evs.map((e) => e.end));
-      row(list, a, b, `${f.name} · ${span(a, b)}`, f.text, need, '', (v) => edit(() => (f.text = v)));
+      const multi = need == null && evs.length > 1;
+      row(list, a, b, `${f.name} · ${span(a, b)}`, f.text, need, multi ? `${evs.length}번 나옴 — '/' 로 나누면 순서대로 (예: 하늘/에서)` : '', (v) => edit(() => (f.text = v)));
     }
   }
 
@@ -137,6 +148,38 @@ export function renderSubPanel(host: SubHost, el: HTMLElement) {
     p.textContent = '이 템플릿엔 입력할 자막 칸이 없어.';
     el.append(p);
   }
+}
+
+/** 하단 자막 장면 안에서 묶음이 안 정해진 구간: 마디마다, 정해진 묶음 사이사이로 끊어서 */
+function implicitGroups(tpl: Template): SubtitleGroup[] {
+  const groups = tpl.subtitleGroups ?? [];
+  const slots = new Map(tpl.slots.map((s) => [s.id, s]));
+  const subOk = (id: string) => {
+    const s = slots.get(id);
+    if (!s || s.role === 'backing' || s.role === 'overlay') return false;
+    return s.noSub != null ? !s.noSub : !!s.label;
+  };
+  const inGroup = (b: number) => groups.some((g) => g.start <= b + 1e-6 && b < g.end - 1e-6);
+  const beats = [...new Set(tpl.notes.filter((n) => subOk(n.slot) && n.beat >= tpl.range.start && !inGroup(n.beat)).map((n) => n.beat))].sort((a, b) => a - b);
+  const out: SubtitleGroup[] = [];
+  for (const sc of tpl.scenes) {
+    if (sc.text !== 'subtitle') continue;
+    const bar0 = Math.floor((sc.start - tpl.barOffset) / tpl.beatsPerBar);
+    for (let k = bar0; tpl.barOffset + k * tpl.beatsPerBar < sc.end; k++) {
+      const a = Math.max(sc.start, tpl.barOffset + k * tpl.beatsPerBar);
+      const b = Math.min(sc.end, tpl.barOffset + (k + 1) * tpl.beatsPerBar);
+      const bs = beats.filter((x) => x >= a - 1e-6 && x < b - 1e-6);
+      let i = 0;
+      while (i < bs.length) {
+        const start = bs[i];
+        // 다음 정해진 묶음이 시작하기 전까지 한 덩어리
+        const nextG = Math.min(b, ...groups.filter((g) => g.start > start + 1e-6).map((g) => g.start));
+        while (i < bs.length && bs[i] < nextG - 1e-6) i++;
+        out.push({ start, end: nextG });
+      }
+    }
+  }
+  return out;
 }
 
 /** 재생헤드가 있는 줄 강조 (매 프레임 불러도 가벼움) */

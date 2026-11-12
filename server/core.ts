@@ -164,25 +164,71 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<boolea
   if (p === '/api/frames') {
     const file = resolveMedia(q.get('file')!);
     const inS = Math.max(0, parseFloat(q.get('in') ?? '0'));
-    const dur = Math.min(6, Math.max(1 / FPS, parseFloat(q.get('dur') ?? '1')));
+    // 긴 구간(최대 2분)은 프레임을 성기게 뽑음: 장수는 최대 MAX_FRAMES, 원본 초당 장수 = min(30, MAX_FRAMES / 길이)
+    const dur = Math.min(120, Math.max(1 / FPS, parseFloat(q.get('dur') ?? '1')));
+    const MAX_FRAMES = 180;
+    const fps = Math.min(FPS, MAX_FRAMES / dur);
     const w = parseInt(q.get('w') ?? '480');
     const h = parseInt(q.get('h') ?? '320');
     const total = await mediaDuration(file);
-    const count = Math.max(1, Math.min(Math.ceil(dur * FPS), Math.floor((total - inS) * FPS)));
+    const count = Math.max(1, Math.min(Math.ceil(dur * fps), Math.floor((total - inS) * fps)));
     const cols = Math.min(count, 10);
     const rows = Math.ceil(count / cols);
-    const out = await cached('.jpg', ['frames', inS, count, w, h], file, (tmp) =>
+    const out = await cached('.jpg', ['frames', inS, count, fps, w, h], file, (tmp) =>
       ffmpeg([
         '-ss', String(inS), '-i', file, '-an',
-        '-vf', `fps=${FPS},scale=${w}:${h}:force_original_aspect_ratio=increase,crop=${w}:${h},tile=${cols}x${rows}`,
+        '-vf', `fps=${fps},scale=${w}:${h}:force_original_aspect_ratio=increase,crop=${w}:${h},tile=${cols}x${rows}`,
         '-frames:v', '1', '-q:v', '4', tmp,
       ]).then(() => undefined),
     );
-    return json(res, { url: `/api/cache/${path.basename(out)}`, cols, rows, count, fps: FPS, w, h }), true;
+    return json(res, { url: `/api/cache/${path.basename(out)}`, cols, rows, count, fps, w, h }), true;
+  }
+
+  if (p === '/api/hiframes' && req.method === 'POST') {
+    // 내보내기용 원본 화질 프레임: 필요한 프레임 번호만, 출력 크기(가운데 맞춰 자르기)로, 무손실 PNG
+    // body: { file, in, fps(스프라이트 기준 초당 장수), w, h, idx: number[] } → { urls: { [idx]: url } }
+    const b = JSON.parse((await readBody(req)).toString('utf8')) as { file: string; in: number; fps: number; w: number; h: number; idx: number[] };
+    const file = resolveMedia(b.file);
+    const idx = [...new Set(b.idx.map((i) => Math.max(0, Math.round(i))))].sort((x, y) => x - y);
+    // 원본을 30fps 로 풀었을 때의 프레임 번호로
+    const nOf = (i: number) => Math.round((i / b.fps) * FPS);
+    const ns = [...new Set(idx.map(nOf))].sort((x, y) => x - y);
+    const dir = await cached('', ['hiframes', b.in, b.fps, b.w, b.h, ns], file, async (tmp) => {
+      await fsp.mkdir(tmp, { recursive: true });
+      // 붙어 있는 번호는 구간으로 묶어서(between) select 식을 짧게, 한 번에 구간 20개씩
+      const ranges: [number, number][] = [];
+      for (const n of ns) {
+        const last = ranges[ranges.length - 1];
+        if (last && n === last[1] + 1) last[1] = n;
+        else ranges.push([n, n]);
+      }
+      const CH = 20;
+      let k = 0;
+      for (let i = 0; i < ranges.length; i += CH) {
+        const part = ranges.slice(i, i + CH);
+        const sel = part.map(([a, z]) => `between(n\\,${a}\\,${z})`).join('+');
+        await ffmpeg([
+          '-ss', String(b.in), '-i', file, '-an',
+          '-vf', `fps=${FPS},select='${sel}',scale=${b.w}:${b.h}:force_original_aspect_ratio=increase:flags=lanczos,crop=${b.w}:${b.h}`,
+          '-fps_mode', 'passthrough', '-start_number', String(k), path.join(tmp, '%06d.png'),
+        ]);
+        k += part.reduce((acc, [a, z]) => acc + z - a + 1, 0);
+      }
+    });
+    // n 순서대로 파일이 생김 → 번호표
+    const files = (await fsp.readdir(dir)).filter((f) => f.endsWith('.png')).sort();
+    const byN = new Map(ns.map((n, i) => [n, files[i]]));
+    const urls: Record<number, string> = {};
+    for (const i of idx) {
+      const f = byN.get(nOf(i)) ?? files[files.length - 1];
+      if (f) urls[i] = `/api/cache/${path.basename(dir)}/${f}`;
+    }
+    return json(res, { urls }), true;
   }
 
   if (p.startsWith('/api/cache/')) {
-    const f = path.join(CACHE, path.basename(p));
+    const rel = decodeURIComponent(p.slice('/api/cache/'.length)).split('/').map((x) => path.basename(x)).join(path.sep);
+    const f = path.join(CACHE, rel);
     if (!fs.existsSync(f)) return json(res, { error: 'not found' }, 404), true;
     await sendFile(req, res, f);
     return true;
@@ -231,7 +277,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<boolea
     const out = path.join(EXPORTS, `${name}-${stamp}.mp4`);
     const proc = spawn('ffmpeg', [
       '-v', 'error', '-y', '-f', 'image2pipe', '-framerate', fps, '-i', '-', '-i', wav,
-      '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p',
+      '-c:v', 'libx264', '-preset', 'slow', '-crf', String(q.get('crf') ?? '14'), '-pix_fmt', 'yuv420p', '-r', fps,
       '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart', out,
     ]);
     const job: ExportJob = {

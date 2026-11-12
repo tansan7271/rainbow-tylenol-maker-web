@@ -9,10 +9,16 @@ export interface Sprite {
   img: CanvasImageSource;
   cols: number;
   count: number;
-  fps: number;
+  fps: number; // 원본 1초당 장수 (긴 구간은 성기게 뽑아서 30 보다 작음)
   w: number;
   h: number;
+  src: { file: string; inSec: number }; // 원본 (내보내기 때 원본 화질 프레임을 다시 뽑으려고)
+  hi?: Map<number, ImageBitmap>; // 내보내기 중: 프레임 번호 → 원본 화질 프레임 (있으면 이걸 그림)
 }
+
+/** 스프라이트 장수 한도: 긴 구간(최대 2분)은 원본 초당 장수를 줄여서 이 안에 */
+const MAX_FRAMES = 180;
+export const spriteFps = (dur: number) => Math.min(FPS, MAX_FRAMES / dur);
 
 export interface ExportSession {
   addFrame(canvas: HTMLCanvasElement, index: number): Promise<void>;
@@ -32,6 +38,8 @@ export interface MediaBackend {
   frames(file: string, inSec: number, dur: number, w: number, h: number): Promise<Sprite>;
   peaks(file: string): Promise<{ rate: number; peaks: number[] }>;
   beginExport(name: string, fps: number, width: number, height: number, audio: AudioBuffer): Promise<ExportSession>;
+  /** 내보내기용 원본 화질 프레임: 스프라이트 프레임 번호마다 w×h(가운데 맞춰 자르기)로 */
+  hiFrames(sp: Sprite, w: number, h: number, idx: number[], onProgress?: (done: number, total: number) => void): Promise<Map<number, () => Promise<ImageBitmap>>>;
 }
 
 const FPS = 30;
@@ -168,7 +176,8 @@ export class BrowserBackend implements MediaBackend {
       v.onloadeddata = () => res();
       v.onerror = () => rej(new Error(`“${file}” 영상을 열 수 없어 (브라우저가 지원하지 않는 형식일 수 있어 — mp4/webm 권장, 아니면 ffmpeg 모드)`));
     });
-    const count = Math.max(1, Math.min(Math.ceil(dur * FPS), Math.floor((v.duration - inSec) * FPS)));
+    const fps = spriteFps(dur);
+    const count = Math.max(1, Math.min(Math.ceil(dur * fps), Math.floor((v.duration - inSec) * fps)));
     const cols = Math.min(count, 10);
     const rows = Math.ceil(count / cols);
     const c = document.createElement('canvas');
@@ -184,13 +193,50 @@ export class BrowserBackend implements MediaBackend {
     for (let i = 0; i < count; i++) {
       await new Promise<void>((res) => {
         v.onseeked = () => res();
-        v.currentTime = inSec + (i + 0.5) / FPS;
+        v.currentTime = inSec + (i + 0.5) / fps;
       });
       g.drawImage(v, sx, sy, sw, sh, (i % cols) * w, Math.floor(i / cols) * h, w, h);
     }
     v.removeAttribute('src');
     v.load();
-    return { img: c, cols, count, fps: FPS, w, h };
+    return { img: c, cols, count, fps, w, h, src: { file, inSec } };
+  }
+  /** 원본 화질 프레임: <video> 를 그 시점으로 옮겨 출력 크기로 그려서 PNG 처럼 손실 없이 비트맵으로 (필요할 때 하나씩) */
+  async hiFrames(sp: Sprite, w: number, h: number, idx: number[]) {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.preload = 'auto';
+    v.src = await this.mediaUrl(sp.src.file);
+    await new Promise<void>((res, rej) => {
+      v.onloadeddata = () => res();
+      v.onerror = () => rej(new Error(`“${sp.src.file}” 영상을 열 수 없어`));
+    });
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const g = c.getContext('2d')!;
+    const s = Math.max(w / v.videoWidth, h / v.videoHeight);
+    const sw = w / s;
+    const sh = h / s;
+    const sx = (v.videoWidth - sw) / 2;
+    const sy = (v.videoHeight - sh) / 2;
+    let chain = Promise.resolve();
+    const out = new Map<number, () => Promise<ImageBitmap>>();
+    for (const i of idx)
+      out.set(i, () => {
+        // 한 영상 요소로 차례차례 (동시에 옮기면 섞임)
+        const p = chain.then(async () => {
+          await new Promise<void>((res) => {
+            v.onseeked = () => res();
+            v.currentTime = sp.src.inSec + (i + 0.5) / sp.fps;
+          });
+          g.drawImage(v, sx, sy, sw, sh, 0, 0, w, h);
+          return createImageBitmap(c);
+        });
+        chain = p.then(() => undefined, () => undefined);
+        return p;
+      });
+    return out;
   }
   async peaks(file: string) {
     const ctx = new OfflineAudioContext(1, 1, 44100);
@@ -208,8 +254,13 @@ export class BrowserBackend implements MediaBackend {
   async beginExport(name: string, fps: number, width: number, height: number, audio: AudioBuffer): Promise<ExportSession> {
     if (!('VideoEncoder' in window) || !('AudioEncoder' in window))
       throw new Error('이 브라우저는 영상 인코딩(WebCodecs)을 지원하지 않아. 크롬/엣지/최신 사파리를 쓰거나 ffmpeg 모드를 써 줘');
-    const vcfg: VideoEncoderConfig = { codec: 'avc1.640028', width, height, bitrate: 8_000_000, framerate: fps };
-    if (!(await VideoEncoder.isConfigSupported(vcfg)).supported) vcfg.codec = 'avc1.42001f';
+    // 고화질: 화소 수 × fps 에 비례한 넉넉한 비트레이트, 큰 화면·60fps 를 받는 H.264 레벨부터 시도
+    const bitrate = Math.round(Math.min(40_000_000, Math.max(6_000_000, width * height * fps * 0.16)));
+    const vcfg: VideoEncoderConfig = { codec: 'avc1.640033', width, height, bitrate, framerate: fps, bitrateMode: 'variable' };
+    for (const codec of ['avc1.640033', 'avc1.64002A', 'avc1.640028', 'avc1.42001f']) {
+      vcfg.codec = codec;
+      if ((await VideoEncoder.isConfigSupported(vcfg)).supported) break;
+    }
     const sr = audio.sampleRate;
     const chs = audio.numberOfChannels;
     let acodec: 'aac' | 'opus' = 'aac';
@@ -321,7 +372,7 @@ export class FfmpegBackend implements MediaBackend {
         img.crossOrigin = 'anonymous';
         img.src = this.base + meta.url;
         await img.decode();
-        return { img, cols: meta.cols, count: meta.count, fps: meta.fps, w: meta.w, h: meta.h } as Sprite;
+        return { img, cols: meta.cols, count: meta.count, fps: meta.fps, w: meta.w, h: meta.h, src: { file, inSec } } as Sprite;
       })();
       p.catch(() => this.spriteCache.delete(key));
       this.spriteCache.set(key, p);
@@ -331,14 +382,27 @@ export class FfmpegBackend implements MediaBackend {
   async peaks(file: string) {
     return (await this.get(`/api/peaks?file=${encodeURIComponent(file)}`)).json();
   }
+  /** 원본 화질 프레임: 도우미가 원본에서 무손실 PNG 로 뽑아 둠 */
+  async hiFrames(sp: Sprite, w: number, h: number, idx: number[]) {
+    const r = await fetch(`${this.base}/api/hiframes`, {
+      method: 'POST',
+      body: JSON.stringify({ file: sp.src.file, in: sp.src.inSec, fps: sp.fps, w, h, idx }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const urls: Record<number, string> = (await r.json()).urls;
+    const out = new Map<number, () => Promise<ImageBitmap>>();
+    for (const [k, u] of Object.entries(urls)) out.set(+k, async () => createImageBitmap(await (await fetch(this.base + u)).blob()));
+    return out;
+  }
   async beginExport(name: string, fps: number, _w: number, _h: number, audio: AudioBuffer): Promise<ExportSession> {
-    const r = await fetch(`${this.base}/api/export/begin?name=${encodeURIComponent(name)}&fps=${fps}`, { method: 'POST', body: encodeWav(audio) });
+    const r = await fetch(`${this.base}/api/export/begin?name=${encodeURIComponent(name)}&fps=${fps}&crf=14`, { method: 'POST', body: encodeWav(audio) });
     if (!r.ok) throw new Error(await r.text());
     const { id } = await r.json();
     const base = this.base;
     return {
       async addFrame(canvas) {
-        const blob = await new Promise<Blob>((res) => canvas.toBlob((b) => res(b!), 'image/jpeg', 0.92));
+        // 무손실 PNG 로 넘기고 도우미가 고화질로 인코딩
+        const blob = await new Promise<Blob>((res) => canvas.toBlob((b) => res(b!), 'image/png'));
         await fetch(`${base}/api/export/frame?id=${id}`, { method: 'POST', body: blob });
       },
       async finish() {

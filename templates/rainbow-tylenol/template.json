@@ -1,7 +1,7 @@
 {
  "name": "Rainbow Tylenol",
  "version": 1,
- "bpm": 135.0,
+ "bpm": 135,
  "tuning": 13,
  "beatOffset": 0.02,
  "beatsPerBar": 4,
@@ -12,7 +12,7 @@
  },
  "range": {
   "start": 32.5,
-  "end": 101.0
+  "end": 101
  },
  "video": {
   "width": 960,
@@ -22,335 +22,402 @@
  "slots": [
   {
    "id": "pA",
-   "name": "파트 A",
-   "label": "",
-   "color": "#ff6b6b",
-   "video": null,
-   "audio": null,
-   "basePitch": 74.3,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": true,
-   "shotRestart": true,
-   "videoSec": 0.7,
-   "audioSec": 0.33
-  },
-  {
-   "id": "pB",
-   "name": "파트 B",
-   "label": "",
-   "color": "#4dabf7",
-   "video": null,
-   "audio": null,
-   "basePitch": 74.0,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": false,
-   "audioTune": true,
-   "videoSec": 0.87,
-   "audioSec": 1.0
-  },
-  {
-   "id": "pC",
-   "name": "파트 C",
-   "label": "",
-   "color": "#51cf66",
-   "video": null,
-   "audio": null,
-   "basePitch": 74.0,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": false,
-   "audioTune": true,
-   "videoSec": 1.03,
-   "audioSec": 1.2
-  },
-  {
-   "id": "pD",
-   "name": "파트 D",
-   "label": "",
-   "color": "#fcc419",
-   "video": null,
-   "audio": null,
-   "basePitch": 74.0,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": false,
-   "audioTune": true,
-   "videoSec": 1.34,
-   "audioSec": 1.4
-  },
-  {
-   "id": "pE",
-   "name": "파트 E",
-   "label": "",
-   "color": "#be4bdb",
    "video": null,
    "audio": null,
    "basePitch": 60,
-   "gain": 1.0,
-   "mode": "gate",
+   "label": "",
+   "name": "파트 A",
+   "color": "#ff6b6b",
+   "gain": 1,
+   "audioSec": 0.33,
+   "role": "lead",
+   "videoSpeed": "shot",
    "videoFollowsPitch": false,
    "shotRestart": true,
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 0.7
+  },
+  {
+   "id": "pB",
+   "video": null,
+   "audio": null,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 B",
+   "color": "#4dabf7",
+   "gain": 1,
+   "audioSec": 1.0,
+   "role": "lead",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "shotRestart": true,
+   "audioTune": true,
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 0.87
+  },
+  {
+   "id": "pC",
+   "video": null,
+   "audio": null,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 C",
+   "color": "#51cf66",
+   "gain": 1,
+   "audioSec": 1.2,
+   "role": "lead",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "audioTune": true,
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 1.03
+  },
+  {
+   "id": "pD",
+   "video": null,
+   "audio": null,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 D",
+   "color": "#fcc419",
+   "gain": 1,
+   "audioSec": 1.4,
+   "role": "lead",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "shotRestart": true,
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 1.34
+  },
+  {
+   "id": "pE",
+   "video": null,
+   "audio": null,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 E",
+   "color": "#be4bdb",
+   "gain": 1,
+   "role": "lead",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "shotRestart": true,
+   "mode": "gate",
    "noSub": true,
    "videoSec": 0.32
   },
   {
    "id": "pF",
-   "name": "파트 F",
-   "label": "",
-   "color": "#69db7c",
-   "video": null,
-   "audio": null,
-   "basePitch": 74.8,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": true,
-   "layer": "quad",
-   "layerText": "가나다라 마바사~",
-   "videoSec": 0.9,
-   "audioSec": 0.8
-  },
-  {
-   "id": "pG",
-   "name": "파트 G",
-   "label": "가—",
-   "color": "#94d82d",
-   "video": null,
-   "audio": null,
-   "basePitch": 74.8,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": true,
-   "role": "overlay",
-   "videoSec": 0.9,
-   "audioSec": 0.45
-  },
-  {
-   "id": "pH",
-   "name": "파트 H",
-   "label": "",
-   "color": "#ff8787",
    "video": null,
    "audio": null,
    "basePitch": 60,
-   "gain": 1.0,
-   "mode": "gate",
+   "label": "",
+   "name": "파트 F",
+   "color": "#69db7c",
+   "gain": 1,
+   "layerText": "가나다라 마바~",
+   "audioSec": 0.8,
+   "role": "lead",
+   "layer": "quad",
+   "quadSound": "once",
+   "videoSpeed": "shot",
    "videoFollowsPitch": false,
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 0.9
+  },
+  {
+   "id": "pG",
+   "video": null,
+   "audio": null,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 G",
+   "color": "#94d82d",
+   "gain": 1,
+   "audioSec": 0.45,
+   "role": "overlay",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 0.55
+  },
+  {
+   "id": "pH",
+   "video": null,
+   "audio": null,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 H",
+   "color": "#ff8787",
+   "gain": 1,
+   "layerText": "가나 다라마 바사아자~",
+   "audioSec": 1.411,
    "role": "overlay",
    "layer": "quad",
    "layerQuad": "tr",
-   "layerText": "가나 다라마 바사아자~",
    "layerTextStyle": "bands",
-   "videoSec": 0.9,
-   "audioSec": 1.411
+   "videoSpeed": "normal",
+   "videoFollowsPitch": false,
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 1.51
   },
   {
    "id": "pI",
-   "name": "파트 I",
-   "label": "",
-   "color": "#f03e3e",
    "video": null,
    "audio": null,
-   "basePitch": 66.0,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 I",
+   "color": "#f03e3e",
+   "gain": 1,
+   "audioSec": 0.12,
+   "role": "lead",
+   "videoSpeed": "pitch",
    "videoFollowsPitch": true,
    "shotRestart": true,
-   "videoSec": 0.54,
-   "audioSec": 0.12
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 0.54
   },
   {
    "id": "pJ",
-   "name": "파트 J",
-   "label": "",
-   "color": "#3bc9db",
    "video": null,
    "audio": null,
-   "basePitch": 68.4,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 J",
+   "color": "#3bc9db",
+   "gain": 1,
+   "audioSec": 0.97,
+   "role": "lead",
+   "videoSpeed": "shot",
    "videoFollowsPitch": false,
    "audioTune": true,
-   "videoSec": 0.66,
-   "audioSec": 0.97
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 0.66
   },
   {
    "id": "pK",
-   "name": "파트 K",
-   "label": "",
-   "color": "#748ffc",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 K",
+   "color": "#748ffc",
+   "gain": 1,
+   "audioSec": 3.767,
+   "role": "lead",
+   "videoSpeed": "normal",
    "videoFollowsPitch": false,
-   "videoSec": 3.77,
-   "audioSec": 3.767
+   "mode": "gate",
+   "noSub": false,
+   "videoSec": 3.77
   },
   {
    "id": "pL",
-   "name": "파트 L",
-   "label": "",
-   "color": "#da77f2",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 L",
+   "color": "#da77f2",
+   "gain": 1,
+   "audioSec": 0.5,
+   "role": "lead",
+   "videoSpeed": "shot",
    "videoFollowsPitch": false,
+   "mode": "gate",
    "noSub": true,
-   "videoSec": 5.43,
-   "audioSec": 0.5
+   "videoSec": 5.43
   },
   {
    "id": "pM",
-   "name": "파트 M",
-   "label": "",
-   "color": "#f783ac",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
-   "mode": "oneshot",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 M",
+   "color": "#f783ac",
+   "gain": 1,
+   "audioSec": 0.5,
+   "role": "lead",
+   "videoSpeed": "normal",
    "videoFollowsPitch": false,
    "shotRestart": true,
+   "mode": "oneshot",
    "noSub": true,
-   "videoSec": 1.88,
-   "audioSec": 0.5
+   "videoSec": 1.88
   },
   {
    "id": "pN",
-   "name": "파트 N",
-   "label": "",
-   "color": "#9775fa",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 N",
+   "color": "#9775fa",
+   "gain": 1,
+   "audioSec": 0.2,
    "videoFollowsPitch": true,
+   "mode": "gate",
+   "noSub": false,
    "audioFrom": "pK",
    "audioFromAt": [
     1.889,
     2.189
-   ],
-   "audioSec": 0.2
+   ]
   },
   {
    "id": "pO",
-   "name": "파트 O",
-   "label": "",
-   "color": "#e03131",
    "video": null,
    "audio": null,
-   "basePitch": 63.4,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": true,
-   "audioFrom": "pH",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 O",
+   "color": "#e03131",
+   "gain": 1,
+   "audioSec": 0.5,
+   "role": "lead",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
    "audioTune": true,
-   "audioSec": 0.5
+   "mode": "gate",
+   "noSub": false
   },
   {
    "id": "pP",
-   "name": "파트 P",
-   "label": "",
-   "color": "#38d9a9",
    "video": null,
    "audio": null,
-   "basePitch": 81.5,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 P",
+   "color": "#38d9a9",
+   "gain": 1,
+   "audioSec": 0.5,
    "videoFollowsPitch": true,
-   "audioSec": 0.5
+   "mode": "gate",
+   "noSub": false
   },
   {
    "id": "pQ",
-   "name": "파트 Q",
-   "label": "",
-   "color": "#ffa94d",
    "video": null,
    "audio": null,
-   "basePitch": 74.0,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 Q",
+   "color": "#ffa94d",
+   "gain": 1,
+   "audioSec": 0.45,
    "videoFollowsPitch": true,
-   "audioSec": 0.45
+   "mode": "gate",
+   "noSub": false
   },
   {
    "id": "pR",
-   "name": "파트 R",
-   "label": "",
-   "color": "#ffd43b",
    "video": null,
    "audio": null,
-   "basePitch": 70.3,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 R",
+   "color": "#ffd43b",
+   "gain": 1,
+   "audioSec": 0.45,
    "videoFollowsPitch": true,
-   "audioSec": 0.45
+   "mode": "gate",
+   "noSub": false
   },
   {
    "id": "pS",
-   "name": "파트 S",
-   "label": "",
-   "color": "#c0eb75",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 S",
+   "color": "#c0eb75",
+   "gain": 1,
+   "audioSec": 0.25,
+   "role": "lead",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
    "mode": "gate",
-   "videoFollowsPitch": true,
-   "audioSec": 0.25
+   "noSub": false
   },
   {
    "id": "pT",
-   "name": "파트 T",
-   "label": "",
-   "color": "#adb5bd",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
-   "mode": "gate",
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 T",
+   "color": "#adb5bd",
+   "gain": 1,
+   "audioSec": 0.9,
+   "role": "lead",
+   "videoSpeed": "pitch",
    "videoFollowsPitch": true,
-   "audioSec": 0.9
+   "mode": "gate",
+   "noSub": false
   },
   {
    "id": "pU",
-   "name": "파트 U",
-   "label": "",
-   "color": "#d9480f",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": true,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 U",
+   "color": "#d9480f",
+   "gain": 1,
+   "audioSec": 0.25,
    "role": "backing",
-   "audioSec": 0.25
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "mode": "gate",
+   "noSub": false
   },
   {
    "id": "pV",
-   "name": "파트 V",
-   "label": "",
-   "color": "#1098ad",
    "video": null,
    "audio": null,
-   "basePitch": 72,
-   "gain": 1.0,
-   "mode": "gate",
-   "videoFollowsPitch": true,
+   "basePitch": 60,
+   "label": "",
+   "name": "파트 V",
+   "color": "#1098ad",
+   "gain": 1,
+   "audioSec": 0.9,
    "role": "backing",
-   "audioSec": 0.9
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "mode": "gate",
+   "noSub": false
+  },
+  {
+   "id": "pW",
+   "name": "파트 W (멜로디 레이어, 소리만)",
+   "label": "",
+   "color": "#ffa8a8",
+   "gain": 0.5,
+   "basePitch": 60,
+   "video": null,
+   "audio": null,
+   "role": "backing",
+   "videoSpeed": "shot",
+   "videoFollowsPitch": false,
+   "mode": "gate",
+   "noSub": true
   }
  ],
  "notes": [
   {
    "id": "m0",
-   "beat": 33.0,
+   "beat": 33,
    "len": 0.75,
    "pitch": 75,
    "slot": "pA",
@@ -366,7 +433,7 @@
   },
   {
    "id": "m2",
-   "beat": 34.0,
+   "beat": 34,
    "len": 0.5,
    "pitch": 75,
    "slot": "pQ",
@@ -382,7 +449,7 @@
   },
   {
    "id": "m4",
-   "beat": 35.0,
+   "beat": 35,
    "len": 0.25,
    "pitch": 74,
    "slot": "pB",
@@ -414,7 +481,7 @@
   },
   {
    "id": "m8",
-   "beat": 36.0,
+   "beat": 36,
    "len": 0.5,
    "pitch": 67,
    "slot": "pB",
@@ -430,7 +497,7 @@
   },
   {
    "id": "m10",
-   "beat": 37.0,
+   "beat": 37,
    "len": 0.75,
    "pitch": 72,
    "slot": "pQ",
@@ -446,7 +513,7 @@
   },
   {
    "id": "m12",
-   "beat": 38.0,
+   "beat": 38,
    "len": 0.5,
    "pitch": 72,
    "slot": "pA",
@@ -462,7 +529,7 @@
   },
   {
    "id": "m14",
-   "beat": 39.0,
+   "beat": 39,
    "len": 0.25,
    "pitch": 74,
    "slot": "pC",
@@ -494,7 +561,7 @@
   },
   {
    "id": "m18",
-   "beat": 40.0,
+   "beat": 40,
    "len": 0.5,
    "pitch": 70,
    "slot": "pC",
@@ -510,7 +577,7 @@
   },
   {
    "id": "m20",
-   "beat": 41.0,
+   "beat": 41,
    "len": 0.75,
    "pitch": 75,
    "slot": "pA",
@@ -526,7 +593,7 @@
   },
   {
    "id": "m22",
-   "beat": 42.0,
+   "beat": 42,
    "len": 0.5,
    "pitch": 75,
    "slot": "pA",
@@ -542,7 +609,7 @@
   },
   {
    "id": "m24",
-   "beat": 43.0,
+   "beat": 43,
    "len": 0.75,
    "pitch": 77,
    "slot": "pD",
@@ -558,7 +625,7 @@
   },
   {
    "id": "m26",
-   "beat": 44.0,
+   "beat": 44,
    "len": 0.5,
    "pitch": 77,
    "slot": "pD",
@@ -574,7 +641,7 @@
   },
   {
    "id": "m28",
-   "beat": 45.0,
+   "beat": 45,
    "len": 0.25,
    "pitch": 79,
    "slot": "pD",
@@ -606,7 +673,7 @@
   },
   {
    "id": "m32",
-   "beat": 46.0,
+   "beat": 46,
    "len": 0.25,
    "pitch": 75,
    "slot": "pS",
@@ -638,7 +705,7 @@
   },
   {
    "id": "m36",
-   "beat": 47.0,
+   "beat": 47,
    "len": 0.25,
    "pitch": 74,
    "slot": "pF",
@@ -670,7 +737,7 @@
   },
   {
    "id": "m40",
-   "beat": 48.0,
+   "beat": 48,
    "len": 0.5,
    "pitch": 74,
    "slot": "pF",
@@ -691,7 +758,7 @@
   },
   {
    "id": "m42",
-   "beat": 49.0,
+   "beat": 49,
    "len": 0.75,
    "pitch": 75,
    "slot": "pG",
@@ -699,7 +766,7 @@
    "spot": "bl",
    "spotBeats": [
     48.75,
-    49.0
+    49
    ]
   },
   {
@@ -712,7 +779,7 @@
   },
   {
    "id": "m44",
-   "beat": 50.0,
+   "beat": 50,
    "len": 0.5,
    "pitch": 75,
    "slot": "pA",
@@ -728,7 +795,7 @@
   },
   {
    "id": "m46",
-   "beat": 51.0,
+   "beat": 51,
    "len": 0.25,
    "pitch": 74,
    "slot": "pB",
@@ -760,7 +827,7 @@
   },
   {
    "id": "m50",
-   "beat": 52.0,
+   "beat": 52,
    "len": 0.5,
    "pitch": 67,
    "slot": "pB",
@@ -776,7 +843,7 @@
   },
   {
    "id": "m52",
-   "beat": 53.0,
+   "beat": 53,
    "len": 0.75,
    "pitch": 72,
    "slot": "pA",
@@ -792,7 +859,7 @@
   },
   {
    "id": "m54",
-   "beat": 54.0,
+   "beat": 54,
    "len": 0.5,
    "pitch": 72,
    "slot": "pA",
@@ -808,7 +875,7 @@
   },
   {
    "id": "m56",
-   "beat": 55.0,
+   "beat": 55,
    "len": 0.25,
    "pitch": 74,
    "slot": "pC",
@@ -840,7 +907,7 @@
   },
   {
    "id": "m60",
-   "beat": 56.0,
+   "beat": 56,
    "len": 0.5,
    "pitch": 70,
    "slot": "pC",
@@ -856,7 +923,7 @@
   },
   {
    "id": "m62",
-   "beat": 57.0,
+   "beat": 57,
    "len": 0.75,
    "pitch": 75,
    "slot": "pA",
@@ -872,7 +939,7 @@
   },
   {
    "id": "m64",
-   "beat": 58.0,
+   "beat": 58,
    "len": 0.5,
    "pitch": 75,
    "slot": "pA",
@@ -888,7 +955,7 @@
   },
   {
    "id": "m66",
-   "beat": 59.0,
+   "beat": 59,
    "len": 0.75,
    "pitch": 77,
    "slot": "pD",
@@ -904,7 +971,7 @@
   },
   {
    "id": "m68",
-   "beat": 60.0,
+   "beat": 60,
    "len": 0.5,
    "pitch": 77,
    "slot": "pD",
@@ -920,7 +987,7 @@
   },
   {
    "id": "m70",
-   "beat": 61.0,
+   "beat": 61,
    "len": 0.25,
    "pitch": 79,
    "slot": "pD",
@@ -952,7 +1019,7 @@
   },
   {
    "id": "m74",
-   "beat": 62.0,
+   "beat": 62,
    "len": 0.25,
    "pitch": 75,
    "slot": "pA",
@@ -984,7 +1051,7 @@
   },
   {
    "id": "m78",
-   "beat": 63.0,
+   "beat": 63,
    "len": 0.25,
    "pitch": 74,
    "slot": "pA",
@@ -1016,7 +1083,7 @@
   },
   {
    "id": "m82",
-   "beat": 64.0,
+   "beat": 64,
    "len": 0.5,
    "pitch": 74,
    "slot": "pP",
@@ -1032,7 +1099,7 @@
   },
   {
    "id": "m84",
-   "beat": 65.0,
+   "beat": 65,
    "len": 0.25,
    "pitch": 68,
    "slot": "pI",
@@ -1064,7 +1131,7 @@
   },
   {
    "id": "m88",
-   "beat": 66.0,
+   "beat": 66,
    "len": 0.25,
    "pitch": 75,
    "slot": "pI",
@@ -1096,7 +1163,7 @@
   },
   {
    "id": "m92",
-   "beat": 67.0,
+   "beat": 67,
    "len": 0.25,
    "pitch": 80,
    "slot": "pI",
@@ -1128,15 +1195,15 @@
   },
   {
    "id": "m96",
-   "beat": 68.0,
-   "len": 1.0,
+   "beat": 68,
+   "len": 1,
    "pitch": 84,
    "slot": "pI",
    "vel": 0.8
   },
   {
    "id": "m97",
-   "beat": 69.0,
+   "beat": 69,
    "len": 0.25,
    "pitch": 82,
    "slot": "pJ",
@@ -1169,7 +1236,7 @@
   },
   {
    "id": "m101",
-   "beat": 70.0,
+   "beat": 70,
    "len": 0.25,
    "pitch": 67,
    "slot": "pJ",
@@ -1226,7 +1293,7 @@
   },
   {
    "id": "m108",
-   "beat": 72.0,
+   "beat": 72,
    "len": 0.25,
    "pitch": 82,
    "slot": "pO",
@@ -1250,7 +1317,7 @@
   },
   {
    "id": "m122",
-   "beat": 77.0,
+   "beat": 77,
    "len": 0.25,
    "pitch": 76,
    "slot": "pN",
@@ -1298,7 +1365,7 @@
   },
   {
    "id": "m128",
-   "beat": 79.0,
+   "beat": 79,
    "len": 0.25,
    "pitch": 77,
    "slot": "pN",
@@ -1346,7 +1413,7 @@
   },
   {
    "id": "m134",
-   "beat": 81.0,
+   "beat": 81,
    "len": 0.25,
    "pitch": 68,
    "slot": "pL",
@@ -1378,7 +1445,7 @@
   },
   {
    "id": "m138",
-   "beat": 82.0,
+   "beat": 82,
    "len": 0.25,
    "pitch": 75,
    "slot": "pL",
@@ -1410,7 +1477,7 @@
   },
   {
    "id": "m142",
-   "beat": 83.0,
+   "beat": 83,
    "len": 0.25,
    "pitch": 80,
    "slot": "pL",
@@ -1442,15 +1509,15 @@
   },
   {
    "id": "m146",
-   "beat": 84.0,
-   "len": 1.0,
+   "beat": 84,
+   "len": 1,
    "pitch": 84,
    "slot": "pL",
    "vel": 0.8
   },
   {
    "id": "m147",
-   "beat": 85.0,
+   "beat": 85,
    "len": 0.25,
    "pitch": 82,
    "slot": "pL",
@@ -1482,7 +1549,7 @@
   },
   {
    "id": "m151",
-   "beat": 86.0,
+   "beat": 86,
    "len": 0.25,
    "pitch": 67,
    "slot": "pL",
@@ -1538,7 +1605,7 @@
   },
   {
    "id": "m158",
-   "beat": 88.0,
+   "beat": 88,
    "len": 0.25,
    "pitch": 82,
    "slot": "pL",
@@ -1578,7 +1645,7 @@
   },
   {
    "id": "m163",
-   "beat": 90.0,
+   "beat": 90,
    "len": 0.25,
    "pitch": 82,
    "slot": "pL",
@@ -1634,7 +1701,7 @@
   },
   {
    "id": "m170",
-   "beat": 92.0,
+   "beat": 92,
    "len": 0.5,
    "pitch": 72,
    "slot": "pL",
@@ -1650,7 +1717,7 @@
   },
   {
    "id": "m172",
-   "beat": 93.0,
+   "beat": 93,
    "len": 0.25,
    "pitch": 76,
    "slot": "pL",
@@ -1698,7 +1765,7 @@
   },
   {
    "id": "m178",
-   "beat": 95.0,
+   "beat": 95,
    "len": 0.25,
    "pitch": 77,
    "slot": "pL",
@@ -1746,7 +1813,7 @@
   },
   {
    "id": "bass0",
-   "beat": 33.0,
+   "beat": 33,
    "len": 0.75,
    "pitch": 48,
    "slot": "pU",
@@ -1778,7 +1845,7 @@
   },
   {
    "id": "bass4",
-   "beat": 35.0,
+   "beat": 35,
    "len": 0.5,
    "pitch": 46,
    "slot": "pU",
@@ -1802,7 +1869,7 @@
   },
   {
    "id": "bass7",
-   "beat": 36.0,
+   "beat": 36,
    "len": 0.5,
    "pitch": 53,
    "slot": "pU",
@@ -1818,7 +1885,7 @@
   },
   {
    "id": "bass9",
-   "beat": 37.0,
+   "beat": 37,
    "len": 0.75,
    "pitch": 44,
    "slot": "pU",
@@ -1850,7 +1917,7 @@
   },
   {
    "id": "bass13",
-   "beat": 39.0,
+   "beat": 39,
    "len": 0.25,
    "pitch": 62,
    "slot": "pU",
@@ -1882,7 +1949,7 @@
   },
   {
    "id": "bass17",
-   "beat": 40.0,
+   "beat": 40,
    "len": 0.5,
    "pitch": 67,
    "slot": "pU",
@@ -1898,7 +1965,7 @@
   },
   {
    "id": "bass19",
-   "beat": 41.0,
+   "beat": 41,
    "len": 0.75,
    "pitch": 39,
    "slot": "pU",
@@ -1930,7 +1997,7 @@
   },
   {
    "id": "bass23",
-   "beat": 43.0,
+   "beat": 43,
    "len": 0.5,
    "pitch": 46,
    "slot": "pU",
@@ -1954,7 +2021,7 @@
   },
   {
    "id": "bass26",
-   "beat": 44.0,
+   "beat": 44,
    "len": 0.25,
    "pitch": 53,
    "slot": "pU",
@@ -1978,7 +2045,7 @@
   },
   {
    "id": "bass29",
-   "beat": 45.0,
+   "beat": 45,
    "len": 0.25,
    "pitch": 56,
    "slot": "pU",
@@ -2010,7 +2077,7 @@
   },
   {
    "id": "bass33",
-   "beat": 46.0,
+   "beat": 46,
    "len": 0.25,
    "pitch": 56,
    "slot": "pU",
@@ -2042,7 +2109,7 @@
   },
   {
    "id": "bass37",
-   "beat": 47.0,
+   "beat": 47,
    "len": 0.25,
    "pitch": 55,
    "slot": "pU",
@@ -2074,7 +2141,7 @@
   },
   {
    "id": "bass41",
-   "beat": 48.0,
+   "beat": 48,
    "len": 0.5,
    "pitch": 55,
    "slot": "pU",
@@ -2090,7 +2157,7 @@
   },
   {
    "id": "bass43",
-   "beat": 49.0,
+   "beat": 49,
    "len": 0.75,
    "pitch": 48,
    "slot": "pU",
@@ -2122,7 +2189,7 @@
   },
   {
    "id": "bass47",
-   "beat": 51.0,
+   "beat": 51,
    "len": 0.5,
    "pitch": 46,
    "slot": "pU",
@@ -2146,7 +2213,7 @@
   },
   {
    "id": "bass50",
-   "beat": 52.0,
+   "beat": 52,
    "len": 0.5,
    "pitch": 53,
    "slot": "pU",
@@ -2162,7 +2229,7 @@
   },
   {
    "id": "bass52",
-   "beat": 53.0,
+   "beat": 53,
    "len": 0.75,
    "pitch": 44,
    "slot": "pU",
@@ -2194,7 +2261,7 @@
   },
   {
    "id": "bass56",
-   "beat": 55.0,
+   "beat": 55,
    "len": 0.25,
    "pitch": 62,
    "slot": "pU",
@@ -2226,7 +2293,7 @@
   },
   {
    "id": "bass60",
-   "beat": 56.0,
+   "beat": 56,
    "len": 0.5,
    "pitch": 67,
    "slot": "pU",
@@ -2242,7 +2309,7 @@
   },
   {
    "id": "bass62",
-   "beat": 57.0,
+   "beat": 57,
    "len": 0.75,
    "pitch": 39,
    "slot": "pU",
@@ -2274,7 +2341,7 @@
   },
   {
    "id": "bass66",
-   "beat": 59.0,
+   "beat": 59,
    "len": 0.5,
    "pitch": 46,
    "slot": "pU",
@@ -2298,7 +2365,7 @@
   },
   {
    "id": "bass69",
-   "beat": 60.0,
+   "beat": 60,
    "len": 0.25,
    "pitch": 53,
    "slot": "pU",
@@ -2322,7 +2389,7 @@
   },
   {
    "id": "bass72",
-   "beat": 61.0,
+   "beat": 61,
    "len": 0.25,
    "pitch": 56,
    "slot": "pU",
@@ -2354,7 +2421,7 @@
   },
   {
    "id": "bass76",
-   "beat": 62.0,
+   "beat": 62,
    "len": 0.25,
    "pitch": 56,
    "slot": "pU",
@@ -2386,7 +2453,7 @@
   },
   {
    "id": "bass80",
-   "beat": 63.0,
+   "beat": 63,
    "len": 0.25,
    "pitch": 55,
    "slot": "pU",
@@ -2418,7 +2485,7 @@
   },
   {
    "id": "bass84",
-   "beat": 64.0,
+   "beat": 64,
    "len": 0.5,
    "pitch": 55,
    "slot": "pU",
@@ -2434,7 +2501,7 @@
   },
   {
    "id": "bass86",
-   "beat": 65.0,
+   "beat": 65,
    "len": 0.25,
    "pitch": 56,
    "slot": "pU",
@@ -2458,7 +2525,7 @@
   },
   {
    "id": "bass89",
-   "beat": 66.0,
+   "beat": 66,
    "len": 0.5,
    "pitch": 56,
    "slot": "pU",
@@ -2498,15 +2565,15 @@
   },
   {
    "id": "bass94",
-   "beat": 68.0,
-   "len": 1.0,
+   "beat": 68,
+   "len": 1,
    "pitch": 56,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "bass95",
-   "beat": 69.0,
+   "beat": 69,
    "len": 0.25,
    "pitch": 63,
    "slot": "pU",
@@ -2530,7 +2597,7 @@
   },
   {
    "id": "bass98",
-   "beat": 70.0,
+   "beat": 70,
    "len": 0.5,
    "pitch": 63,
    "slot": "pU",
@@ -2570,15 +2637,15 @@
   },
   {
    "id": "bass103",
-   "beat": 72.0,
-   "len": 1.0,
+   "beat": 72,
+   "len": 1,
    "pitch": 63,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "bass104",
-   "beat": 73.0,
+   "beat": 73,
    "len": 0.25,
    "pitch": 58,
    "slot": "pU",
@@ -2602,7 +2669,7 @@
   },
   {
    "id": "bass107",
-   "beat": 74.0,
+   "beat": 74,
    "len": 0.5,
    "pitch": 58,
    "slot": "pU",
@@ -2642,15 +2709,15 @@
   },
   {
    "id": "bass112",
-   "beat": 76.0,
-   "len": 1.0,
+   "beat": 76,
+   "len": 1,
    "pitch": 58,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "bass113",
-   "beat": 77.0,
+   "beat": 77,
    "len": 0.25,
    "pitch": 60,
    "slot": "pU",
@@ -2674,7 +2741,7 @@
   },
   {
    "id": "bass116",
-   "beat": 78.0,
+   "beat": 78,
    "len": 0.5,
    "pitch": 60,
    "slot": "pU",
@@ -2714,15 +2781,15 @@
   },
   {
    "id": "bass121",
-   "beat": 80.0,
-   "len": 1.0,
+   "beat": 80,
+   "len": 1,
    "pitch": 60,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "bass122",
-   "beat": 81.0,
+   "beat": 81,
    "len": 0.25,
    "pitch": 56,
    "slot": "pU",
@@ -2746,7 +2813,7 @@
   },
   {
    "id": "bass125",
-   "beat": 82.0,
+   "beat": 82,
    "len": 0.5,
    "pitch": 56,
    "slot": "pU",
@@ -2786,15 +2853,15 @@
   },
   {
    "id": "bass130",
-   "beat": 84.0,
-   "len": 1.0,
+   "beat": 84,
+   "len": 1,
    "pitch": 56,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "bass131",
-   "beat": 85.0,
+   "beat": 85,
    "len": 0.25,
    "pitch": 63,
    "slot": "pU",
@@ -2818,7 +2885,7 @@
   },
   {
    "id": "bass134",
-   "beat": 86.0,
+   "beat": 86,
    "len": 0.5,
    "pitch": 63,
    "slot": "pU",
@@ -2858,15 +2925,15 @@
   },
   {
    "id": "bass139",
-   "beat": 88.0,
-   "len": 1.0,
+   "beat": 88,
+   "len": 1,
    "pitch": 63,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "bass140",
-   "beat": 89.0,
+   "beat": 89,
    "len": 0.25,
    "pitch": 58,
    "slot": "pU",
@@ -2890,7 +2957,7 @@
   },
   {
    "id": "bass143",
-   "beat": 90.0,
+   "beat": 90,
    "len": 0.5,
    "pitch": 58,
    "slot": "pU",
@@ -2930,15 +2997,15 @@
   },
   {
    "id": "bass148",
-   "beat": 92.0,
-   "len": 1.0,
+   "beat": 92,
+   "len": 1,
    "pitch": 58,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "bass149",
-   "beat": 93.0,
+   "beat": 93,
    "len": 0.25,
    "pitch": 60,
    "slot": "pU",
@@ -2962,7 +3029,7 @@
   },
   {
    "id": "bass152",
-   "beat": 94.0,
+   "beat": 94,
    "len": 0.5,
    "pitch": 60,
    "slot": "pU",
@@ -3002,31 +3069,31 @@
   },
   {
    "id": "bass157",
-   "beat": 96.0,
-   "len": 1.0,
+   "beat": 96,
+   "len": 1,
    "pitch": 60,
    "slot": "pU",
    "vel": 0.56
   },
   {
    "id": "harmony0",
-   "beat": 68.0,
-   "len": 1.0,
+   "beat": 68,
+   "len": 1,
    "pitch": 74,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony1",
-   "beat": 69.0,
-   "len": 3.0,
+   "beat": 69,
+   "len": 3,
    "pitch": 75,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony2",
-   "beat": 72.0,
+   "beat": 72,
    "len": 0.5,
    "pitch": 77,
    "slot": "pV",
@@ -3058,31 +3125,31 @@
   },
   {
    "id": "harmony6",
-   "beat": 73.0,
-   "len": 2.0,
+   "beat": 73,
+   "len": 2,
    "pitch": 74,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony7",
-   "beat": 75.0,
-   "len": 2.0,
+   "beat": 75,
+   "len": 2,
    "pitch": 70,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony8",
-   "beat": 77.0,
-   "len": 3.0,
+   "beat": 77,
+   "len": 3,
    "pitch": 72,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony9",
-   "beat": 80.0,
+   "beat": 80,
    "len": 0.25,
    "pitch": 72,
    "slot": "pV",
@@ -3106,31 +3173,31 @@
   },
   {
    "id": "harmony12",
-   "beat": 81.0,
-   "len": 3.0,
+   "beat": 81,
+   "len": 3,
    "pitch": 68,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony13",
-   "beat": 84.0,
-   "len": 1.0,
+   "beat": 84,
+   "len": 1,
    "pitch": 74,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony14",
-   "beat": 85.0,
-   "len": 3.0,
+   "beat": 85,
+   "len": 3,
    "pitch": 75,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony15",
-   "beat": 88.0,
+   "beat": 88,
    "len": 0.5,
    "pitch": 77,
    "slot": "pV",
@@ -3162,39 +3229,39 @@
   },
   {
    "id": "harmony19",
-   "beat": 89.0,
-   "len": 2.0,
+   "beat": 89,
+   "len": 2,
    "pitch": 74,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony20",
-   "beat": 91.0,
-   "len": 2.0,
+   "beat": 91,
+   "len": 2,
    "pitch": 70,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony21",
-   "beat": 93.0,
-   "len": 3.0,
+   "beat": 93,
+   "len": 3,
    "pitch": 72,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony22",
-   "beat": 96.0,
-   "len": 1.0,
+   "beat": 96,
+   "len": 1,
    "pitch": 72,
    "slot": "pV",
    "vel": 0.8
   },
   {
    "id": "harmony23",
-   "beat": 97.0,
+   "beat": 97,
    "len": 0.5,
    "pitch": 72,
    "slot": "pV",
@@ -3202,7 +3269,7 @@
   },
   {
    "id": "dbl-m28",
-   "beat": 45.0,
+   "beat": 45,
    "len": 0.25,
    "pitch": 67,
    "slot": "pD",
@@ -3234,7 +3301,7 @@
   },
   {
    "id": "dbl-m32",
-   "beat": 46.0,
+   "beat": 46,
    "len": 0.25,
    "pitch": 63,
    "slot": "pS",
@@ -3266,7 +3333,7 @@
   },
   {
    "id": "dbl-m36",
-   "beat": 47.0,
+   "beat": 47,
    "len": 0.25,
    "pitch": 62,
    "slot": "pF",
@@ -3298,7 +3365,7 @@
   },
   {
    "id": "dbl-m40",
-   "beat": 48.0,
+   "beat": 48,
    "len": 0.5,
    "pitch": 62,
    "slot": "pF",
@@ -3319,7 +3386,7 @@
   },
   {
    "id": "dbl-m70",
-   "beat": 61.0,
+   "beat": 61,
    "len": 0.25,
    "pitch": 67,
    "slot": "pD",
@@ -3351,7 +3418,7 @@
   },
   {
    "id": "dbl-m74",
-   "beat": 62.0,
+   "beat": 62,
    "len": 0.25,
    "pitch": 63,
    "slot": "pA",
@@ -3383,7 +3450,7 @@
   },
   {
    "id": "dbl-m78",
-   "beat": 63.0,
+   "beat": 63,
    "len": 0.25,
    "pitch": 62,
    "slot": "pA",
@@ -3415,7 +3482,7 @@
   },
   {
    "id": "dbl-m82",
-   "beat": 64.0,
+   "beat": 64,
    "len": 0.5,
    "pitch": 62,
    "slot": "pP",
@@ -3447,15 +3514,15 @@
   },
   {
    "id": "dbl-m96",
-   "beat": 68.0,
-   "len": 1.0,
+   "beat": 68,
+   "len": 1,
    "pitch": 72,
    "slot": "pI",
    "vel": 0.64
   },
   {
    "id": "dbl-m97",
-   "beat": 69.0,
+   "beat": 69,
    "len": 0.25,
    "pitch": 70,
    "slot": "pJ",
@@ -3488,7 +3555,7 @@
   },
   {
    "id": "dbl-m101",
-   "beat": 70.0,
+   "beat": 70,
    "len": 0.25,
    "pitch": 55,
    "slot": "pJ",
@@ -3545,7 +3612,7 @@
   },
   {
    "id": "dbl-m108",
-   "beat": 72.0,
+   "beat": 72,
    "len": 0.25,
    "pitch": 70,
    "slot": "pO",
@@ -3569,7 +3636,7 @@
   },
   {
    "id": "dbl-m122",
-   "beat": 77.0,
+   "beat": 77,
    "len": 0.25,
    "pitch": 64,
    "slot": "pN",
@@ -3617,7 +3684,7 @@
   },
   {
    "id": "dbl-m128",
-   "beat": 79.0,
+   "beat": 79,
    "len": 0.25,
    "pitch": 65,
    "slot": "pN",
@@ -3665,7 +3732,7 @@
   },
   {
    "id": "dbl-m134",
-   "beat": 81.0,
+   "beat": 81,
    "len": 0.25,
    "pitch": 56,
    "slot": "pL",
@@ -3697,7 +3764,7 @@
   },
   {
    "id": "dbl-m138",
-   "beat": 82.0,
+   "beat": 82,
    "len": 0.25,
    "pitch": 63,
    "slot": "pL",
@@ -3729,7 +3796,7 @@
   },
   {
    "id": "dbl-m142",
-   "beat": 83.0,
+   "beat": 83,
    "len": 0.25,
    "pitch": 68,
    "slot": "pL",
@@ -3761,15 +3828,15 @@
   },
   {
    "id": "dbl-m146",
-   "beat": 84.0,
-   "len": 1.0,
+   "beat": 84,
+   "len": 1,
    "pitch": 72,
    "slot": "pL",
    "vel": 0.64
   },
   {
    "id": "dbl-m147",
-   "beat": 85.0,
+   "beat": 85,
    "len": 0.25,
    "pitch": 70,
    "slot": "pL",
@@ -3801,7 +3868,7 @@
   },
   {
    "id": "dbl-m151",
-   "beat": 86.0,
+   "beat": 86,
    "len": 0.25,
    "pitch": 55,
    "slot": "pL",
@@ -3857,7 +3924,7 @@
   },
   {
    "id": "dbl-m158",
-   "beat": 88.0,
+   "beat": 88,
    "len": 0.25,
    "pitch": 70,
    "slot": "pL",
@@ -3897,7 +3964,7 @@
   },
   {
    "id": "dbl-m163",
-   "beat": 90.0,
+   "beat": 90,
    "len": 0.25,
    "pitch": 70,
    "slot": "pL",
@@ -3953,7 +4020,7 @@
   },
   {
    "id": "dbl-m170",
-   "beat": 92.0,
+   "beat": 92,
    "len": 0.5,
    "pitch": 60,
    "slot": "pL",
@@ -3969,7 +4036,7 @@
   },
   {
    "id": "dbl-m172",
-   "beat": 93.0,
+   "beat": 93,
    "len": 0.25,
    "pitch": 64,
    "slot": "pL",
@@ -4017,7 +4084,7 @@
   },
   {
    "id": "dbl-m178",
-   "beat": 95.0,
+   "beat": 95,
    "len": 0.25,
    "pitch": 65,
    "slot": "pL",
@@ -4065,7 +4132,7 @@
   },
   {
    "id": "pg0",
-   "beat": 49.0,
+   "beat": 49,
    "len": 0.5,
    "pitch": 60,
    "slot": "pG",
@@ -4105,7 +4172,7 @@
   },
   {
    "id": "pg5",
-   "beat": 51.0,
+   "beat": 51,
    "len": 0.5,
    "pitch": 60,
    "slot": "pG",
@@ -4129,7 +4196,7 @@
   },
   {
    "id": "pg8",
-   "beat": 52.0,
+   "beat": 52,
    "len": 0.5,
    "pitch": 70,
    "slot": "pG",
@@ -4145,7 +4212,7 @@
   },
   {
    "id": "pg10",
-   "beat": 53.0,
+   "beat": 53,
    "len": 0.5,
    "pitch": 60,
    "slot": "pG",
@@ -4185,7 +4252,7 @@
   },
   {
    "id": "pg15",
-   "beat": 55.0,
+   "beat": 55,
    "len": 0.25,
    "pitch": 60,
    "slot": "pG",
@@ -4217,7 +4284,7 @@
   },
   {
    "id": "pg19",
-   "beat": 56.0,
+   "beat": 56,
    "len": 0.25,
    "pitch": 70,
    "slot": "pG",
@@ -4241,7 +4308,7 @@
   },
   {
    "id": "pg22",
-   "beat": 57.0,
+   "beat": 57,
    "len": 0.5,
    "pitch": 60,
    "slot": "pG",
@@ -4281,7 +4348,7 @@
   },
   {
    "id": "pg27",
-   "beat": 59.0,
+   "beat": 59,
    "len": 0.5,
    "pitch": 60,
    "slot": "pG",
@@ -4305,7 +4372,7 @@
   },
   {
    "id": "pg30",
-   "beat": 60.0,
+   "beat": 60,
    "len": 0.5,
    "pitch": 70,
    "slot": "pG",
@@ -4321,7 +4388,7 @@
   },
   {
    "id": "pg32",
-   "beat": 61.0,
+   "beat": 61,
    "len": 0.5,
    "pitch": 60,
    "slot": "pG",
@@ -4329,7 +4396,7 @@
   },
   {
    "id": "pg33",
-   "beat": 64.0,
+   "beat": 64,
    "len": 0.5,
    "pitch": 60,
    "slot": "pG",
@@ -4369,7 +4436,7 @@
   },
   {
    "id": "pgf4",
-   "beat": 63.0,
+   "beat": 63,
    "len": 0.25,
    "pitch": 60,
    "slot": "pG",
@@ -4433,7 +4500,7 @@
   },
   {
    "id": "gun0",
-   "beat": 81.0,
+   "beat": 81,
    "len": 0.25,
    "pitch": 72,
    "slot": "pM",
@@ -4441,7 +4508,7 @@
   },
   {
    "id": "gun1",
-   "beat": 93.0,
+   "beat": 93,
    "len": 0.25,
    "pitch": 72,
    "slot": "pM",
@@ -4465,7 +4532,7 @@
   },
   {
    "id": "gun4",
-   "beat": 95.0,
+   "beat": 95,
    "len": 0.25,
    "pitch": 72,
    "slot": "pM",
@@ -4489,10 +4556,594 @@
   },
   {
    "id": "gun7",
-   "beat": 97.0,
+   "beat": 97,
    "len": 0.25,
    "pitch": 72,
    "slot": "pM",
+   "vel": 0.8
+  },
+  {
+   "id": "melo0",
+   "beat": 72.75,
+   "len": 0.75,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo1",
+   "beat": 73.5,
+   "len": 0.5,
+   "pitch": 74,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo2",
+   "beat": 74,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo3",
+   "beat": 74.25,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo4",
+   "beat": 74.5,
+   "len": 0.25,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo5",
+   "beat": 74.75,
+   "len": 0.5,
+   "pitch": 74,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo6",
+   "beat": 75.25,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo7",
+   "beat": 75.5,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo8",
+   "beat": 75.75,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo9",
+   "beat": 76,
+   "len": 0.5,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo10",
+   "beat": 76.5,
+   "len": 0.5,
+   "pitch": 74,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo11",
+   "beat": 77,
+   "len": 0.25,
+   "pitch": 76,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo12",
+   "beat": 77.25,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo13",
+   "beat": 77.5,
+   "len": 0.25,
+   "pitch": 76,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo14",
+   "beat": 77.75,
+   "len": 0.5,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo15",
+   "beat": 78.25,
+   "len": 0.25,
+   "pitch": 79,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo16",
+   "beat": 78.5,
+   "len": 0.5,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo17",
+   "beat": 79,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo18",
+   "beat": 79.25,
+   "len": 0.25,
+   "pitch": 79,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo19",
+   "beat": 79.5,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo20",
+   "beat": 79.75,
+   "len": 0.5,
+   "pitch": 76,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo21",
+   "beat": 80.25,
+   "len": 0.25,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo22",
+   "beat": 80.5,
+   "len": 0.5,
+   "pitch": 76,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo23",
+   "beat": 81,
+   "len": 0.25,
+   "pitch": 68,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo24",
+   "beat": 81.25,
+   "len": 0.25,
+   "pitch": 63,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo25",
+   "beat": 81.5,
+   "len": 0.25,
+   "pitch": 68,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo26",
+   "beat": 81.75,
+   "len": 0.25,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo27",
+   "beat": 82,
+   "len": 0.25,
+   "pitch": 75,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo28",
+   "beat": 82.25,
+   "len": 0.25,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo29",
+   "beat": 82.5,
+   "len": 0.25,
+   "pitch": 75,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo30",
+   "beat": 82.75,
+   "len": 0.25,
+   "pitch": 79,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo31",
+   "beat": 83,
+   "len": 0.25,
+   "pitch": 80,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo32",
+   "beat": 83.25,
+   "len": 0.25,
+   "pitch": 75,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo33",
+   "beat": 83.5,
+   "len": 0.25,
+   "pitch": 80,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo34",
+   "beat": 83.75,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo35",
+   "beat": 84,
+   "len": 1,
+   "pitch": 84,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo36",
+   "beat": 85,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo37",
+   "beat": 85.25,
+   "len": 0.25,
+   "pitch": 79,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo38",
+   "beat": 85.5,
+   "len": 0.25,
+   "pitch": 75,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo39",
+   "beat": 85.75,
+   "len": 0.25,
+   "pitch": 70,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo40",
+   "beat": 86,
+   "len": 0.25,
+   "pitch": 67,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo41",
+   "beat": 86.25,
+   "len": 0.25,
+   "pitch": 70,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo42",
+   "beat": 86.5,
+   "len": 0.25,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo43",
+   "beat": 86.75,
+   "len": 0.5,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo44",
+   "beat": 87.25,
+   "len": 0.25,
+   "pitch": 75,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo45",
+   "beat": 87.5,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo46",
+   "beat": 87.75,
+   "len": 0.25,
+   "pitch": 75,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo47",
+   "beat": 88,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo48",
+   "beat": 88.25,
+   "len": 0.25,
+   "pitch": 74,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo49",
+   "beat": 88.5,
+   "len": 0.25,
+   "pitch": 75,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo50",
+   "beat": 88.75,
+   "len": 0.75,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo51",
+   "beat": 89.5,
+   "len": 0.5,
+   "pitch": 74,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo52",
+   "beat": 90,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo53",
+   "beat": 90.25,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo54",
+   "beat": 90.5,
+   "len": 0.25,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo55",
+   "beat": 90.75,
+   "len": 0.5,
+   "pitch": 74,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo56",
+   "beat": 91.25,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo57",
+   "beat": 91.5,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo58",
+   "beat": 91.75,
+   "len": 0.25,
+   "pitch": 82,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo59",
+   "beat": 92,
+   "len": 0.5,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo60",
+   "beat": 92.5,
+   "len": 0.5,
+   "pitch": 74,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo61",
+   "beat": 93,
+   "len": 0.25,
+   "pitch": 76,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo62",
+   "beat": 93.25,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo63",
+   "beat": 93.5,
+   "len": 0.25,
+   "pitch": 76,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo64",
+   "beat": 93.75,
+   "len": 0.5,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo65",
+   "beat": 94.25,
+   "len": 0.25,
+   "pitch": 79,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo66",
+   "beat": 94.5,
+   "len": 0.5,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo67",
+   "beat": 95,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo68",
+   "beat": 95.25,
+   "len": 0.25,
+   "pitch": 79,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo69",
+   "beat": 95.5,
+   "len": 0.25,
+   "pitch": 77,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo70",
+   "beat": 95.75,
+   "len": 0.5,
+   "pitch": 76,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo71",
+   "beat": 96.25,
+   "len": 0.25,
+   "pitch": 72,
+   "slot": "pW",
+   "vel": 0.8
+  },
+  {
+   "id": "melo72",
+   "beat": 96.5,
+   "len": 0.5,
+   "pitch": 76,
+   "slot": "pW",
    "vel": 0.8
   }
  ],
@@ -4501,7 +5152,8 @@
    "start": 32.5,
    "end": 43,
    "layout": "full",
-   "text": "subtitle"
+   "text": "subtitle",
+   "fx": []
   },
   {
    "start": 43,
@@ -4523,7 +5175,7 @@
   },
   {
    "start": 64.75,
-   "end": 69.0,
+   "end": 69,
    "layout": "full",
    "text": "ticker",
    "tickerKeys": [
@@ -4558,7 +5210,7 @@
    ]
   },
   {
-   "start": 69.0,
+   "start": 69,
    "end": 72.75,
    "layout": "full",
    "text": "none"
@@ -4608,6 +5260,31 @@
   },
   {
    "start": 34.825,
+   "end": 35.25,
+   "slot": "pB"
+  },
+  {
+   "start": 35.25,
+   "end": 35.5,
+   "slot": "pB"
+  },
+  {
+   "start": 35.5,
+   "end": 35.75,
+   "slot": "pB"
+  },
+  {
+   "start": 35.75,
+   "end": 36,
+   "slot": "pB"
+  },
+  {
+   "start": 36,
+   "end": 36.5,
+   "slot": "pB"
+  },
+  {
+   "start": 36.5,
    "end": 36.55,
    "slot": "pB"
   },
@@ -4694,12 +5371,12 @@
   },
   {
    "start": 45.75,
-   "end": 46.0,
+   "end": 46,
    "slot": "pE",
    "flip": true
   },
   {
-   "start": 46.0,
+   "start": 46,
    "end": 46.25,
    "slot": "pE",
    "flipV": true
@@ -4718,12 +5395,12 @@
   },
   {
    "start": 46.75,
-   "end": 47.0,
+   "end": 47,
    "slot": "pE",
    "flip": true
   },
   {
-   "start": 47.0,
+   "start": 47,
    "end": 47.25,
    "slot": "pE",
    "flipV": true
@@ -4742,25 +5419,25 @@
   },
   {
    "start": 47.75,
-   "end": 48.0,
+   "end": 48,
    "slot": "pE",
    "flip": true
   },
   {
-   "start": 48.0,
+   "start": 48,
    "end": 48.5,
    "slot": "pE",
    "flipV": true
   },
   {
    "start": 48.5,
-   "end": 49.0,
+   "end": 49,
    "slot": "pE",
    "flip": true,
    "flipV": true
   },
   {
-   "start": 49.0,
+   "start": 49,
    "end": 49.25,
    "slot": "pE"
   },
@@ -4777,6 +5454,31 @@
   },
   {
    "start": 50.825,
+   "end": 51.25,
+   "slot": "pB"
+  },
+  {
+   "start": 51.25,
+   "end": 51.5,
+   "slot": "pB"
+  },
+  {
+   "start": 51.5,
+   "end": 51.75,
+   "slot": "pB"
+  },
+  {
+   "start": 51.75,
+   "end": 52,
+   "slot": "pB"
+  },
+  {
+   "start": 52,
+   "end": 52.5,
+   "slot": "pB"
+  },
+  {
+   "start": 52.5,
    "end": 52.55,
    "slot": "pB"
   },
@@ -4863,12 +5565,12 @@
   },
   {
    "start": 61.75,
-   "end": 62.0,
+   "end": 62,
    "slot": "pE",
    "flip": true
   },
   {
-   "start": 62.0,
+   "start": 62,
    "end": 62.25,
    "slot": "pE",
    "flipV": true
@@ -4887,12 +5589,12 @@
   },
   {
    "start": 62.75,
-   "end": 63.0,
+   "end": 63,
    "slot": "pE",
    "flip": true
   },
   {
-   "start": 63.0,
+   "start": 63,
    "end": 63.25,
    "slot": "pE",
    "flipV": true
@@ -4911,25 +5613,25 @@
   },
   {
    "start": 63.75,
-   "end": 64.0,
+   "end": 64,
    "slot": "pE",
    "flip": true
   },
   {
-   "start": 64.0,
+   "start": 64,
    "end": 64.5,
    "slot": "pE",
    "flipV": true
   },
   {
    "start": 64.5,
-   "end": 65.0,
+   "end": 65,
    "slot": "pE",
    "flip": true,
    "flipV": true
   },
   {
-   "start": 65.0,
+   "start": 65,
    "end": 65.25,
    "slot": "pI",
    "flip": true
@@ -4949,13 +5651,13 @@
   },
   {
    "start": 65.75,
-   "end": 66.0,
+   "end": 66,
    "slot": "pI",
    "flipV": true,
    "flip": true
   },
   {
-   "start": 66.0,
+   "start": 66,
    "end": 66.25,
    "slot": "pI",
    "flip": true
@@ -4975,13 +5677,13 @@
   },
   {
    "start": 66.75,
-   "end": 67.0,
+   "end": 67,
    "slot": "pI",
    "flipV": true,
    "flip": true
   },
   {
-   "start": 67.0,
+   "start": 67,
    "end": 67.25,
    "slot": "pI",
    "flip": true
@@ -4999,17 +5701,17 @@
   },
   {
    "start": 67.75,
-   "end": 68.0,
+   "end": 68,
    "slot": "pI"
   },
   {
-   "start": 68.0,
-   "end": 69.0,
+   "start": 68,
+   "end": 69,
    "slot": "pI",
    "flip": true
   },
   {
-   "start": 69.0,
+   "start": 69,
    "end": 69.5,
    "slot": "pJ",
    "flip": true,
@@ -5018,14 +5720,14 @@
   },
   {
    "start": 69.5,
-   "end": 70.0,
+   "end": 70,
    "slot": "pJ",
    "flip": true,
    "clipAt": 0,
    "part": 1
   },
   {
-   "start": 70.0,
+   "start": 70,
    "end": 71.25,
    "slot": "pJ",
    "clipAt": 0.5,
@@ -5034,54 +5736,54 @@
   {
    "start": 71.25,
    "end": 71.5,
-   "slot": "pH"
+   "slot": "pO"
   },
   {
    "start": 71.5,
    "end": 71.75,
-   "slot": "pH",
+   "slot": "pO",
    "flip": true
   },
   {
    "start": 71.75,
-   "end": 72.0,
-   "slot": "pH"
+   "end": 72,
+   "slot": "pO"
   },
   {
-   "start": 72.0,
+   "start": 72,
    "end": 72.25,
-   "slot": "pH",
+   "slot": "pO",
    "flip": true
   },
   {
    "start": 72.25,
    "end": 72.5,
-   "slot": "pH"
+   "slot": "pO"
   },
   {
    "start": 72.5,
    "end": 72.75,
-   "slot": "pH",
+   "slot": "pO",
    "flip": true
   },
   {
    "start": 72.75,
-   "end": 81.0,
+   "end": 81,
    "slot": "pK"
   },
   {
-   "start": 81.0,
-   "end": 93.0,
+   "start": 81,
+   "end": 93,
    "slot": "pL"
   },
   {
-   "start": 81.0,
+   "start": 81,
    "end": 81.75,
    "slot": "pM",
    "over": true
   },
   {
-   "start": 93.0,
+   "start": 93,
    "end": 93.75,
    "slot": "pM"
   },
@@ -5093,11 +5795,11 @@
   },
   {
    "start": 94.5,
-   "end": 95.0,
+   "end": 95,
    "slot": "pM"
   },
   {
-   "start": 95.0,
+   "start": 95,
    "end": 95.75,
    "slot": "pM",
    "flipV": true
@@ -5111,77 +5813,85 @@
   },
   {
    "start": 96.5,
-   "end": 97.0,
+   "end": 97,
    "slot": "pM"
   },
   {
-   "start": 97.0,
-   "end": 101.0,
+   "start": 97,
+   "end": 101,
    "slot": "pM"
   }
  ],
  "subtitleGroups": [
   {
-   "start": 33.0,
-   "end": 35.0,
+   "start": 33,
+   "end": 35,
    "exit": "left"
   },
   {
-   "start": 35.0,
-   "end": 37.0,
+   "start": 35,
+   "end": 37,
    "exit": "right"
   },
   {
-   "start": 37.0,
-   "end": 39.0,
+   "start": 37,
+   "end": 39,
    "exit": "left"
   },
   {
-   "start": 39.0,
-   "end": 41.0,
+   "start": 39,
+   "end": 41,
    "exit": "right"
   },
   {
-   "start": 41.0,
-   "end": 43.0
+   "start": 41,
+   "end": 43
   },
   {
-   "start": 45.0,
-   "end": 49.0
+   "start": 45,
+   "end": 49
   },
   {
-   "start": 49.0,
-   "end": 51.0,
+   "start": 49,
+   "end": 51,
    "exit": "left",
    "textFrom": 0
   },
   {
-   "start": 51.0,
-   "end": 53.0,
+   "start": 51,
+   "end": 53,
    "exit": "right",
    "textFrom": 1
   },
   {
-   "start": 53.0,
-   "end": 55.0,
+   "start": 53,
+   "end": 55,
    "exit": "left",
    "textFrom": 2
   },
   {
-   "start": 55.0,
-   "end": 57.0,
+   "start": 55,
+   "end": 57,
    "exit": "right",
    "textFrom": 3
   },
   {
-   "start": 57.0,
-   "end": 59.0,
+   "start": 57,
+   "end": 59,
    "textFrom": 4
   },
   {
-   "start": 61.0,
-   "end": 65.0,
+   "start": 61,
+   "end": 65,
    "textFrom": 5
+  },
+  {
+   "start": 43,
+   "end": 45
+  },
+  {
+   "start": 59,
+   "end": 61
   }
  ],
  "texts": [
@@ -5191,7 +5901,7 @@
    "x": 0.5,
    "y": 0.5,
    "anim": "burst",
-   "size": 1.0,
+   "size": 1,
    "field": "f3",
    "unit": 0
   },
@@ -5201,22 +5911,22 @@
    "x": 0.5,
    "y": 0.5,
    "anim": "burst",
-   "size": 1.0,
+   "size": 1,
    "field": "f3",
    "unit": 1
   },
   {
    "start": 71.75,
-   "end": 72.0,
+   "end": 72,
    "x": 0.5,
    "y": 0.5,
    "anim": "burst",
-   "size": 1.0,
+   "size": 1,
    "field": "f3",
    "unit": 2
   },
   {
-   "start": 69.0,
+   "start": 69,
    "end": 69.95,
    "x": 0.3,
    "y": 0.667,
@@ -5236,7 +5946,7 @@
    "field": "f1"
   },
   {
-   "start": 70.0,
+   "start": 70,
    "end": 72.25,
    "x": 0.42,
    "y": 0.2,
@@ -5292,13 +6002,13 @@
    "unit": 3
   },
   {
-   "start": 72.0,
+   "start": 72,
    "end": 73.4,
    "x": 0.42,
    "y": 0.2,
    "from": "right",
    "exit": "fly",
-   "exitAt": 73.0,
+   "exitAt": 73,
    "field": "f2",
    "unit": 0
   },
@@ -5309,7 +6019,7 @@
    "y": 0.38,
    "from": "left",
    "exit": "fly",
-   "exitAt": 73.0,
+   "exitAt": 73,
    "field": "f2",
    "unit": 1
   },
@@ -5320,7 +6030,7 @@
    "y": 0.56,
    "from": "right",
    "exit": "fly",
-   "exitAt": 73.0,
+   "exitAt": 73,
    "field": "f2",
    "unit": 2
   },
@@ -5331,12 +6041,12 @@
    "y": 0.74,
    "from": "left",
    "exit": "fly",
-   "exitAt": 73.0,
+   "exitAt": 73,
    "field": "f2",
    "unit": 3
   },
   {
-   "start": 72.0,
+   "start": 72,
    "end": 73.5,
    "x": 0.5,
    "y": 0.9,
@@ -5346,7 +6056,7 @@
    "field": "f4"
   },
   {
-   "start": 74.0,
+   "start": 74,
    "end": 76.15,
    "x": 0.94,
    "y": 0.52,
@@ -5355,8 +6065,8 @@
    "field": "f5"
   },
   {
-   "start": 76.0,
-   "end": 77.0,
+   "start": 76,
+   "end": 77,
    "x": 0.65,
    "y": 0.75,
    "anim": "spinArc",
@@ -5379,8 +6089,8 @@
    "field": "f7"
   },
   {
-   "start": 77.0,
-   "end": 78.0,
+   "start": 77,
+   "end": 78,
    "x": 0.65,
    "y": 0.75,
    "anim": "spinArc",
@@ -5403,8 +6113,8 @@
    "field": "f7"
   },
   {
-   "start": 78.0,
-   "end": 79.0,
+   "start": 78,
+   "end": 79,
    "x": 0.65,
    "y": 0.95,
    "anim": "spinArc",
@@ -5427,8 +6137,8 @@
    "field": "f7"
   },
   {
-   "start": 79.0,
-   "end": 80.0,
+   "start": 79,
+   "end": 80,
    "x": 0.65,
    "y": 0.7,
    "anim": "spinArc",
@@ -5451,16 +6161,16 @@
    "field": "f7"
   },
   {
-   "start": 80.0,
-   "end": 81.0,
+   "start": 80,
+   "end": 81,
    "x": 0.65,
    "y": 0.75,
    "anim": "spinArc",
    "field": "f7"
   },
   {
-   "start": 98.0,
-   "end": 101.0,
+   "start": 98,
+   "end": 101,
    "x": 0.5,
    "y": 0.5,
    "anim": "static",
@@ -5472,7 +6182,7 @@
  ],
  "fadeToBlack": {
   "start": 97.25,
-  "end": 98.0
+  "end": 98
  },
  "textFields": [
   {
@@ -5516,6 +6226,7 @@
    "text": "토큰다씀 ㅎㅅㅎ"
   }
  ],
+ "loopSplit": 49,
  "youtube": {
   "id": "kV0mc-a79HM",
   "lag": 0.22844
